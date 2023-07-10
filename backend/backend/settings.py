@@ -12,6 +12,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 ROOT_URLCONF = 'backend.urls'
+AUTH_USER_MODEL = "users.User"
 WSGI_APPLICATION = 'backend.wsgi.application'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
