@@ -12,7 +12,9 @@ class User(AbstractUser):
         unique=True,
         blank=False,
         null=False,
-        error_messages={'unique': translate('A user with that email already exists.')}
+        error_messages={
+            'unique': translate('A user with that email already exists.')
+        }
     )
     username = models.CharField(
         translate('username'),
@@ -21,7 +23,9 @@ class User(AbstractUser):
         blank=False,
         null=False,
         validators=[UnicodeUsernameValidator()],
-        error_messages={'unique': translate('A user with that username already exists.')},
+        error_messages={
+            'unique': translate('A user with that username already exists.')
+        },
         help_text=translate('Username should have 254 symbols at the most.'
                             'Allowed symbols: letters, numbers, @/./+/-/_ only')
     )
@@ -44,13 +48,24 @@ class User(AbstractUser):
 
 class Subscribe(models.Model):
     """Модель подписки пользователей на других пользователей"""
-    subscriber = models.ForeignKey('User', on_delete=models.CASCADE, related_name="subscriptions")
-    subscription = models.ForeignKey('User', on_delete=models.CASCADE)
+    subscriber = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        related_name="subscriptions"
+    )
+    subscription = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE
+    )
 
     class Meta:
         db_table = "api_subscribe"
         constraints = [
             models.UniqueConstraint(
                 fields=['subscriber', 'subscription'],
-                name='unique_subscriber_subscription')
+                name='unique user subscription'),
+            models.CheckConstraint(
+                check=~models.Q(subscriber=models.F('subscription')),
+                name='self subscription'
+            )
         ]
