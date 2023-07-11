@@ -7,15 +7,15 @@ from users.serializers import UserSerializer
 class IngredientsSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all(),
-        source='ingredient',
-        write_only=True,
+        source='ingredient'
     )
     name = serializers.CharField(
         source='ingredient.name',
         read_only=True
     )
     measurement_unit = serializers.CharField(
-        source='ingredient.measurement_unit', read_only=True
+        source='ingredient.measurement_unit',
+        read_only=True
     )
 
     class Meta:
@@ -27,6 +27,12 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ("id", "name", "color", "slug")
+
+
+class IngredientsWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Amount
+        fields = ("amount", "ingredient")
 
 
 class RecipeViewSerializer(serializers.ModelSerializer):
@@ -41,8 +47,10 @@ class RecipeViewSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    tags = serializers.PrimaryKeyRelatedField(many=True, required=True,
-                                              queryset=Tag.objects.all())
+    tags = serializers.PrimaryKeyRelatedField(
+        many=True,
+        required=True,
+        queryset=Tag.objects.all())
     ingredients = IngredientsSerializer(many=True, required=True)
     author = UserSerializer(read_only=True)
     image = Base64ImageField(required=False)
@@ -59,14 +67,37 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags = validated_data.pop("tags")
         author = self.context.get("request").user
         ingredients = validated_data.pop("ingredients")
+
+        ingredient_list = []
+        for item in ingredients:
+            ingredient, amount = item.values()
+            ingredient_list.append({"ingredient": ingredient.pk, "amount": amount})
+
+        serializer = IngredientsWriteSerializer(many=True, data=ingredient_list)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+
+        # ingredient_list = []
+        # for item in ingredients:
+        #     amount = Amount.objects.create(**item)
+        #     ingredient_list.append(amount)
         recipe = Recipe.objects.create(**validated_data, author=author)
         recipe.tags.set(tags)
-        ingredients_list = []
-        for item in ingredients:
-            ingredients_list.append(item.get("ingredient").pk)
-            Amount.objects.create(**item)
-        recipe.ingredients.set(ingredients_list)
+        # recipe.ingredients.set(ingredient_list)
         return recipe
+
+    def update(self, instance, validated_data):
+        for ingredient in instance.ingredients.all():
+            ingredient.delete()
+
+        ingredients = validated_data.pop("ingredients", None)
+        ingredient_list = []
+        for item in ingredients:
+            amount = Amount.objects.create(**item)
+            ingredient_list.append(amount)
+
+        instance.ingredients.set(ingredient_list)
+        return super().update(instance, validated_data)
 
 
 class AbstractSerializer(serializers.ModelSerializer):

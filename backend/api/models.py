@@ -21,6 +21,7 @@ def validate_hex_color(value):
 
 
 class Tag(models.Model):
+    """Таблица тегов"""
     name = models.CharField(
         max_length=200,
         unique=True,
@@ -43,6 +44,7 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
+    """Таблица рецепта"""
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -50,6 +52,10 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(
         Tag,
     )
+    # ingredients = models.ManyToManyField( # new
+    #     "Amount",
+    #     related_name="recipee"
+    # )
     image = models.ImageField(
         upload_to="recipe/"
     )
@@ -72,20 +78,21 @@ class Recipe(models.Model):
     )
 
 
-class Ingredient(models.Model):
-    name = models.CharField(
-        max_length=200,
-        blank=False,
-        null=False
-    )
-    measurement_unit = models.CharField(
-        max_length=200,
-        blank=False,
-        null=False
-    )
+# class AmountRecipe(models.Model):
+#     """Промежуточная таблица Рецепт - ингредиент"""
+#     amount = models.ForeignKey(
+#         "Amount",
+#         on_delete=models.CASCADE
+#     )
+#     recipe = models.ForeignKey(
+#         Recipe,
+#         on_delete=models.CASCADE,
+#         related_name="recipe_amount"
+#     )
 
 
 class Amount(models.Model):
+    """Таблица ингредиента, содержит количество и ссылку на ингредиент"""
     amount = models.PositiveIntegerField(
         validators=[
             validate_not_zero,
@@ -97,22 +104,29 @@ class Amount(models.Model):
     recipe = models.ManyToManyField(
         Recipe,
         related_name="ingredients",
-        through="AmountRecipe"
+        # through="AmountRecipe"
+        # on_delete=models.CASCADE
     )
+    # recipe = models.ManyToManyField(
+    #     Recipe,
+    # )
     ingredient = models.ForeignKey(
-        Ingredient,
+        "Ingredient",
         on_delete=models.CASCADE
     )
 
 
-class AmountRecipe(models.Model):
-    amount = models.ForeignKey(
-        Amount,
-        on_delete=models.PROTECT
+class Ingredient(models.Model):
+    """Таблица ингредиент, содержит только информацию об ингредиенте"""
+    name = models.CharField(
+        max_length=200,
+        blank=False,
+        null=False
     )
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE
+    measurement_unit = models.CharField(
+        max_length=200,
+        blank=False,
+        null=False
     )
 
 
