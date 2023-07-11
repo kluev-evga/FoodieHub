@@ -7,15 +7,16 @@ from api.serializers import (
     TagSerializer,
 )
 from django.db.models import F, Sum
-from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     http_method_names = ('head', 'options', 'get', 'post', 'patch', 'delete')
 
     @action(methods=['get'], detail=False)
@@ -54,15 +55,12 @@ class RecipeViewSet(ModelViewSet):
             return Response(status=204)
 
 
-class TagViewSet(mixins.ListModelMixin,
-                 mixins.RetrieveModelMixin,
-                 GenericViewSet):
+class TagViewSet(ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
+    pagination_class = None
 
 
-class IngredientViewSet(mixins.ListModelMixin,
-                        mixins.RetrieveModelMixin,
-                        GenericViewSet):
+class IngredientViewSet(ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()

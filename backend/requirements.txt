@@ -3,3 +3,5 @@ djangorestframework==3.14.0
 python-dotenv==1.0.0
 djoser==2.2.0
 drf-writable-nested==0.7.0
+Pillow==10.0.0
+drf-base64==2.0

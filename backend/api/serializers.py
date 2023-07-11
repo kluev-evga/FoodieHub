@@ -1,6 +1,7 @@
 from api.models import Amount, Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
+from drf_base64.fields import Base64ImageField
 
 
 class IngredientsSerializer(serializers.ModelSerializer):
@@ -25,14 +26,14 @@ class IngredientsSerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = '__all__'
-        # read_only_fields = ("name", "color", "slug")
+        fields = ("id", "name", "color", "slug")
 
 
 class RecipeSerializer(WritableNestedModelSerializer):
-    # tags = TagSerializer(many=True) # ломается post & patch ...
+    # tags = TagSerializer(many=True)
     ingredients = IngredientsSerializer(many=True, required=True)
     author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    image = Base64ImageField(required=False)
 
     class Meta:
         model = Recipe
@@ -41,8 +42,7 @@ class RecipeSerializer(WritableNestedModelSerializer):
 
 class AbstractSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    recipe = serializers.PrimaryKeyRelatedField(
-        write_only=True, queryset=Recipe.objects.all())
+    recipe = serializers.PrimaryKeyRelatedField(write_only=True, queryset=Recipe.objects.all())
 
     id = serializers.PrimaryKeyRelatedField(source="recipe", read_only=True)
     name = serializers.SlugRelatedField(
