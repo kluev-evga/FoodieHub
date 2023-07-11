@@ -1,9 +1,10 @@
+import re
+
 from django.contrib.auth import get_user_model
 from django.core import validators
-from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.utils.translation import gettext_lazy as translate
-import re
 
 User = get_user_model()
 
@@ -44,11 +45,10 @@ class Tag(models.Model):
 class Recipe(models.Model):
     author = models.ForeignKey(
         User,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     tags = models.ManyToManyField(
         Tag,
-        related_name="tags"
     )
     image = models.ImageField(
         upload_to="recipe/"
@@ -96,10 +96,22 @@ class Amount(models.Model):
     )
     recipe = models.ManyToManyField(
         Recipe,
-        related_name="ingredients"
+        related_name="ingredients",
+        through="AmountRecipe"
     )
     ingredient = models.ForeignKey(
         Ingredient,
+        on_delete=models.CASCADE
+    )
+
+
+class AmountRecipe(models.Model):
+    amount = models.ForeignKey(
+        Amount,
+        on_delete=models.PROTECT
+    )
+    recipe = models.ForeignKey(
+        Recipe,
         on_delete=models.CASCADE
     )
 

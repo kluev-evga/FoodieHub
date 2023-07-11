@@ -8,9 +8,9 @@ from api.serializers import (
 )
 from django.db.models import F, Sum
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
 class RecipeViewSet(ModelViewSet):

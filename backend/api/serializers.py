@@ -1,7 +1,7 @@
 from api.models import Amount, Favorite, Ingredient, Recipe, ShoppingCart, Tag
-from drf_writable_nested.serializers import WritableNestedModelSerializer
-from rest_framework import serializers
 from drf_base64.fields import Base64ImageField
+from rest_framework import serializers
+from users.serializers import UserSerializer
 
 
 class IngredientsSerializer(serializers.ModelSerializer):
@@ -29,20 +29,50 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "color", "slug")
 
 
-class RecipeSerializer(WritableNestedModelSerializer):
-    # tags = TagSerializer(many=True)
-    ingredients = IngredientsSerializer(many=True, required=True)
-    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+class RecipeViewSerializer(serializers.ModelSerializer):
+    tags = TagSerializer(many=True, read_only=True)
+    ingredients = IngredientsSerializer(many=True, read_only=True)
+    author = UserSerializer(read_only=True)
     image = Base64ImageField(required=False)
 
     class Meta:
         model = Recipe
-        fields = '__all__'
+        fields = "__all__"
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+    tags = serializers.PrimaryKeyRelatedField(many=True, required=True,
+                                              queryset=Tag.objects.all())
+    ingredients = IngredientsSerializer(many=True, required=True)
+    author = UserSerializer(read_only=True)
+    image = Base64ImageField(required=False)
+
+    class Meta:
+        model = Recipe
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        context = self.context.get("request")
+        return RecipeViewSerializer(instance, context={"request": context}).data
+
+    def create(self, validated_data):
+        tags = validated_data.pop("tags")
+        author = self.context.get("request").user
+        ingredients = validated_data.pop("ingredients")
+        recipe = Recipe.objects.create(**validated_data, author=author)
+        recipe.tags.set(tags)
+        ingredients_list = []
+        for item in ingredients:
+            ingredients_list.append(item.get("ingredient").pk)
+            Amount.objects.create(**item)
+        recipe.ingredients.set(ingredients_list)
+        return recipe
 
 
 class AbstractSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    recipe = serializers.PrimaryKeyRelatedField(write_only=True, queryset=Recipe.objects.all())
+    recipe = serializers.PrimaryKeyRelatedField(
+        write_only=True, queryset=Recipe.objects.all())
 
     id = serializers.PrimaryKeyRelatedField(source="recipe", read_only=True)
     name = serializers.SlugRelatedField(
