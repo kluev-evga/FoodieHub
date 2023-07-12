@@ -127,6 +127,7 @@ class ShoppingCartSerializer(AbstractSerializer):
             )
         ]
 
+
 class ShoppingCartDestroySerializer(AbstractSerializer):
     class Meta(AbstractSerializer.Meta):
         model = ShoppingCart
@@ -142,6 +143,11 @@ class FavoriteSerializer(AbstractSerializer):
                 message=translate("this user already have in favourites")
             )
         ]
+
+
+class FavoriteDestroySerializer(AbstractSerializer):
+    class Meta(AbstractSerializer.Meta):
+        model = Favorite
 
 
 class IngredientSerializer(serializers.ModelSerializer):

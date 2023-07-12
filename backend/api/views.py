@@ -5,14 +5,16 @@ from api.serializers import (
     RecipeSerializer,
     ShoppingCartSerializer,
     TagSerializer,
-    ShoppingCartDestroySerializer
+    ShoppingCartDestroySerializer,
+    FavoriteDestroySerializer
 )
+from api.utils import perform_create_or_delte
+
 from django.db.models import F, Sum
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from django.utils.translation import gettext_lazy as translate
 
 
 class RecipeViewSet(ModelViewSet):
@@ -39,32 +41,25 @@ class RecipeViewSet(ModelViewSet):
 
     @action(methods=['post', 'delete'], detail=True)
     def shopping_cart(self, request, pk):
-        arguments = {"data": {"recipe": pk}, "context": {"request": request}}
-
-        if request.method == "POST":
-            serializer = ShoppingCartSerializer(**arguments)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data)
-
-        serializer = ShoppingCartDestroySerializer(**arguments)
-        serializer.is_valid(raise_exception=True)
-        instance = ShoppingCart.objects.filter(user=request.user, recipe_id=pk)
-        if not instance:
-            return Response({"message": translate("not exist")}, status=400)
-        instance.delete()
-        return Response(status=204)
+        arguments = {
+            "pk": pk,
+            "request": request,
+            "model": ShoppingCart,
+            "post_serializer": ShoppingCartSerializer,
+            "destroy_serializer": ShoppingCartDestroySerializer
+        }
+        return perform_create_or_delte(**arguments)
 
     @action(methods=['post', 'delete'], detail=True)
     def favorite(self, request, pk):
-        serializer = FavoriteSerializer(data={"recipe": pk}, context={"request": request})
-        if serializer.is_valid(raise_exception=True):
-            if request.method == "POST":
-                serializer.save()
-                return Response(serializer.data)
-
-            Favorite.objects.get(user=request.user, recipe_id=pk).delete()
-            return Response(status=204)
+        arguments = {
+            "pk": pk,
+            "request": request,
+            "model": Favorite,
+            "post_serializer": FavoriteSerializer,
+            "destroy_serializer": FavoriteDestroySerializer
+        }
+        return perform_create_or_delte(**arguments)
 
 
 class TagViewSet(ReadOnlyModelViewSet):
