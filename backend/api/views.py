@@ -8,9 +8,11 @@ from api.serializers import (
     ShoppingCartDestroySerializer,
     FavoriteDestroySerializer
 )
+from api.filters import IngredientFilter
 from api.utils import perform_create_or_delte
 
 from django.db.models import F, Sum
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -71,3 +73,6 @@ class TagViewSet(ReadOnlyModelViewSet):
 class IngredientViewSet(ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
+    pagination_class = None
+    filterset_class = IngredientFilter
+    filter_backends = (DjangoFilterBackend,)
