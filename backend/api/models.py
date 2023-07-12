@@ -52,10 +52,6 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(
         Tag,
     )
-    # ingredients = models.ManyToManyField( # new
-    #     "Amount",
-    #     related_name="recipee"
-    # )
     image = models.ImageField(
         upload_to="recipe/"
     )
@@ -78,19 +74,6 @@ class Recipe(models.Model):
     )
 
 
-# class AmountRecipe(models.Model):
-#     """Промежуточная таблица Рецепт - ингредиент"""
-#     amount = models.ForeignKey(
-#         "Amount",
-#         on_delete=models.CASCADE
-#     )
-#     recipe = models.ForeignKey(
-#         Recipe,
-#         on_delete=models.CASCADE,
-#         related_name="recipe_amount"
-#     )
-
-
 class Amount(models.Model):
     """Таблица ингредиента, содержит количество и ссылку на ингредиент"""
     amount = models.PositiveIntegerField(
@@ -104,22 +87,25 @@ class Amount(models.Model):
     recipe = models.ManyToManyField(
         Recipe,
         related_name="ingredients",
-        # through="AmountRecipe"
-        # on_delete=models.CASCADE
     )
-    # recipe = models.ManyToManyField(
-    #     Recipe,
-    # )
     ingredient = models.ForeignKey(
         "Ingredient",
         on_delete=models.CASCADE
     )
+
+    # class Meta:
+    #     constraints = [
+    #         models.UniqueConstraint(
+    #             fields=['recipe', 'ingredient'],
+    #             name='recipe_ingredient_constraint'),
+    #     ]
 
 
 class Ingredient(models.Model):
     """Таблица ингредиент, содержит только информацию об ингредиенте"""
     name = models.CharField(
         max_length=200,
+        unique=True,
         blank=False,
         null=False
     )
@@ -140,6 +126,13 @@ class ShoppingCart(models.Model):
         on_delete=models.CASCADE
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='shopping_cart_user_recipe_constraint'),
+        ]
+
 
 class Favorite(models.Model):
     user = models.ForeignKey(
@@ -150,3 +143,10 @@ class Favorite(models.Model):
         Recipe,
         on_delete=models.CASCADE
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='favorite_user_recipe_constraint'),
+        ]

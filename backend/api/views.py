@@ -5,12 +5,14 @@ from api.serializers import (
     RecipeSerializer,
     ShoppingCartSerializer,
     TagSerializer,
+    ShoppingCartDestroySerializer
 )
 from django.db.models import F, Sum
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from django.utils.translation import gettext_lazy as translate
 
 
 class RecipeViewSet(ModelViewSet):
@@ -18,6 +20,11 @@ class RecipeViewSet(ModelViewSet):
     serializer_class = RecipeSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     http_method_names = ('head', 'options', 'get', 'post', 'patch', 'delete')
+
+    def perform_destroy(self, instance):
+        for ingredient in instance.ingredients.all():
+            ingredient.delete()
+        instance.delete()
 
     @action(methods=['get'], detail=False)
     def download_shopping_cart(self, request):
@@ -32,20 +39,25 @@ class RecipeViewSet(ModelViewSet):
 
     @action(methods=['post', 'delete'], detail=True)
     def shopping_cart(self, request, pk):
-        serializer = ShoppingCartSerializer(
-            data={"recipe": pk}, context={"request": request})
-        if serializer.is_valid(raise_exception=True):
-            if request.method == "POST":
-                serializer.save()
-                return Response(serializer.data)
+        arguments = {"data": {"recipe": pk}, "context": {"request": request}}
 
-            ShoppingCart.objects.get(user=request.user, recipe_id=pk).delete()
-            return Response(status=204)
+        if request.method == "POST":
+            serializer = ShoppingCartSerializer(**arguments)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+
+        serializer = ShoppingCartDestroySerializer(**arguments)
+        serializer.is_valid(raise_exception=True)
+        instance = ShoppingCart.objects.filter(user=request.user, recipe_id=pk)
+        if not instance:
+            return Response({"message": translate("not exist")}, status=400)
+        instance.delete()
+        return Response(status=204)
 
     @action(methods=['post', 'delete'], detail=True)
     def favorite(self, request, pk):
-        serializer = FavoriteSerializer(
-            data={"recipe": pk}, context={"request": request})
+        serializer = FavoriteSerializer(data={"recipe": pk}, context={"request": request})
         if serializer.is_valid(raise_exception=True):
             if request.method == "POST":
                 serializer.save()
