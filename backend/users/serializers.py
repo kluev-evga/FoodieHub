@@ -41,6 +41,19 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
         fields = ("email", "id", "username", "first_name", "last_name")
 
 
+from api.models import Recipe
+
+
+class RelatedRecipesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ("id", "name", "image", "cooking_time")
+
+
+class QueryParamsSerializer(serializers.Serializer):
+    recipes_limit = serializers.IntegerField(min_value=0)
+
+
 class SubscribeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscribe
@@ -53,8 +66,18 @@ class SubscribeSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        serializer = UserSerializer(instance.subscription, context={"request": self.context.get("request")})
-        return serializer.data
+        request = self.context.get("request")
+        serializer = UserSerializer(instance.subscription, context={"request": request})
+
+        recipes = instance.subscription.recipes
+        limit = request.query_params.get("recipes_limit", None)
+        if limit:
+            recipes_limit = QueryParamsSerializer(data={"recipes_limit": limit})
+            recipes_limit.is_valid(raise_exception=True)
+            recipes_limit = recipes_limit.data.get("recipes_limit")
+            recipes = recipes.all()[:recipes_limit]
+        recipes = RelatedRecipesSerializer(recipes, many=True).data
+        return {**serializer.data, "recipes": recipes}
 
     def validate(self, data):
         if self.context.get('request').user == data.get("subscription"):

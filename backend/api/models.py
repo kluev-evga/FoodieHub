@@ -48,6 +48,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
+        related_name="recipes" # для subscribe
     )
     tags = models.ManyToManyField(
         Tag,
