@@ -52,6 +52,10 @@ class SubscribeSerializer(serializers.ModelSerializer):
                 message='Вы уже подписаны на данного пользователя')
         ]
 
+    def to_representation(self, instance):
+        serializer = UserSerializer(instance.subscription, context={"request": self.context.get("request")})
+        return serializer.data
+
     def validate(self, data):
         if self.context.get('request').user == data.get("subscription"):
             raise ValidationError("Нельзя подписаться на себя")
