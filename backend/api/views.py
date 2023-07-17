@@ -8,7 +8,7 @@ from api.serializers import (
     ShoppingCartDestroySerializer,
     FavoriteDestroySerializer
 )
-from api.filters import IngredientFilter
+from api.filters import IngredientFilter, RecipeFilter
 from api.utils import perform_create_or_delte
 
 from django.db.models import F, Sum
@@ -24,6 +24,8 @@ class RecipeViewSet(ModelViewSet):
     serializer_class = RecipeSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     http_method_names = ('head', 'options', 'get', 'post', 'patch', 'delete')
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
     def perform_destroy(self, instance):
         for ingredient in instance.ingredients.all():
