@@ -44,10 +44,22 @@ class RecipeRepresentationSerializer(serializers.ModelSerializer):
     ingredients = IngredientsSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
     image = Base64ImageField(required=False)
+    is_favorited = serializers.SerializerMethodField(read_only=True)
+    is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
         fields = "__all__"
+
+    def get_is_favorited(self, instance):
+        request = self.context.get("request")
+        return (request.user.is_authenticated and
+                request.user.favorite.filter(recipe=instance).exists())
+
+    def get_is_in_shopping_cart(self, instance):
+        request = self.context.get("request")
+        return (request.user.is_authenticated and
+                request.user.shopping_cart.filter(recipe=instance).exists())
 
 
 class RecipeSerializer(serializers.ModelSerializer):

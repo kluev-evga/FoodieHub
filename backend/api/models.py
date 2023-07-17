@@ -119,7 +119,8 @@ class Ingredient(models.Model):
 class ShoppingCart(models.Model):
     user = models.ForeignKey(
         User,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="shopping_cart"  # -> RecipeRepresentationSerializer
     )
     recipe = models.ForeignKey(
         Recipe,
@@ -137,7 +138,8 @@ class ShoppingCart(models.Model):
 class Favorite(models.Model):
     user = models.ForeignKey(
         User,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="favorite"  # -> RecipeRepresentationSerializer
     )
     recipe = models.ForeignKey(
         Recipe,
