@@ -26,10 +26,17 @@ class UserViewSet(DjoserUserViewSet):
 
     @action(methods=["get"], detail=False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
-        queryset = Subscribe.objects.filter(subscriber=request.user.pk)
+        queryset = request.user.subscriptions.all()
         page = self.paginate_queryset(queryset)
         serializer = SubscriptionsSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+    # Еще вариант:
+    # @action(methods=["get"], detail=False, permission_classes=[IsAuthenticated])
+    # def subscriptions(self, request):
+    #     queryset = request.user.subscriptions.all()
+    #     serializer = SubscribeSerializer(queryset, many=True, context={"request": request})
+    #     return Response(serializer.data)
 
     @action(methods=["post", "delete"], detail=True, permission_classes=[IsAuthenticated])
     def subscribe(self, request, id):

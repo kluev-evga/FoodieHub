@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 from users.models import Subscribe
+from api.models import Recipe
 
 User = get_user_model()
 
@@ -29,25 +30,35 @@ class UserCreateSerializer(DjoserUserCreateSerializer):
         fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password')
 
 
+class RelatedRecipesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ("id", "name", "image", "cooking_time")
+
+
 class SubscriptionsSerializer(serializers.ModelSerializer):
     email = serializers.SlugRelatedField(source="subscription", slug_field="email", read_only=True)
     id = serializers.PrimaryKeyRelatedField(source="subscription", read_only=True)
     username = serializers.SlugRelatedField(source="subscription", slug_field="username", read_only=True)
     first_name = serializers.SlugRelatedField(source="subscription", slug_field="first_name", read_only=True)
     last_name = serializers.SlugRelatedField(source="subscription", slug_field="last_name", read_only=True)
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
+    recipies = RelatedRecipesSerializer(source="subscription.recipes", many=True)
+    recipes_count = serializers.SerializerMethodField(source="subscription")
 
     class Meta:
         model = Subscribe
-        fields = ("email", "id", "username", "first_name", "last_name")
+        fields = ("email", "id", "username", "first_name", "last_name", "is_subscribed", "recipies", "recipes_count")
 
+    # def to_representation(self, instance):
+    #     asdf = instance
+    #     return super().to_representation(instance)
 
-from api.models import Recipe
+    def get_is_subscribed(*args):
+        return True
 
-
-class RelatedRecipesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Recipe
-        fields = ("id", "name", "image", "cooking_time")
+    def get_recipes_count(self, value):
+        return value.subscription.recipes.count()
 
 
 class QueryParamsSerializer(serializers.Serializer):
