@@ -61,6 +61,35 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
         return value.subscription.recipes.count()
 
 
+# ---------------------------------------------------------------CONCEPT:
+class CustomListSerializer(serializers.ListSerializer):
+    def to_representation(self, data):
+        self.context.get("limit")
+        iterable = data.all()[:10]
+        self.context["recipes_count"] = iterable.count()
+        return [self.child.to_representation(item) for item in iterable]
+
+
+class RecipiesTestSerializer(serializers.ModelSerializer):
+    class Meta:
+        list_serializer_class = CustomListSerializer
+        model = Recipe
+        fields = ("id", "name", "image", "cooking_time")
+
+
+class TestSerializer(UserSerializer):
+    recipies = RecipiesTestSerializer(source="recipes", many=True)
+    recipes_count = serializers.SerializerMethodField()
+
+    def get_recipes_count(self, _):
+        return self.context.get("recipes_count")
+
+    class Meta:
+        model = User
+        fields = ("email", "id", "username", "first_name", "last_name", "is_subscribed", "recipies", "recipes_count")
+
+
+# ---------------------------------------------------------------CONCEPT END
 class QueryParamsSerializer(serializers.Serializer):
     recipes_limit = serializers.IntegerField(min_value=0)
 

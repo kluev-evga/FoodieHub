@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from users.models import Subscribe
-from users.serializers import SubscribeSerializer, SubscriptionsSerializer
+from users.serializers import SubscribeSerializer, SubscriptionsSerializer, UserSerializer, TestSerializer
 
 User = get_user_model()
 
@@ -24,12 +24,13 @@ class UserViewSet(DjoserUserViewSet):
         self.get_object = self.get_instance
         return self.retrieve(request, *args, **kwargs)
 
-    @action(methods=["get"], detail=False, permission_classes=[IsAuthenticated])
-    def subscriptions(self, request):
-        queryset = request.user.subscriptions.all()
-        page = self.paginate_queryset(queryset)
-        serializer = SubscriptionsSerializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+    # @action(methods=["get"], detail=False, permission_classes=[IsAuthenticated])
+    # def subscriptions(self, request):
+    #     queryset = request.user.subscriptions.all()
+    #     page = self.paginate_queryset(queryset)
+    #     serializer = SubscriptionsSerializer(page, many=True)
+    #     data = serializer.data
+    #     return self.get_paginated_response(data)
 
     # Еще вариант:
     # @action(methods=["get"], detail=False, permission_classes=[IsAuthenticated])
@@ -37,6 +38,14 @@ class UserViewSet(DjoserUserViewSet):
     #     queryset = request.user.subscriptions.all()
     #     serializer = SubscribeSerializer(queryset, many=True, context={"request": request})
     #     return Response(serializer.data)
+
+    @action(methods=["get"], detail=False, permission_classes=[IsAuthenticated])
+    def subscriptions(self, request):
+        queryset = User.objects.filter(subscription__subscriber=request.user)
+        page = self.paginate_queryset(queryset)
+        serializer = TestSerializer(page, many=True, context={"request": request, "limit": 1})
+        data = serializer.data
+        return self.get_paginated_response(data)
 
     @action(methods=["post", "delete"], detail=True, permission_classes=[IsAuthenticated])
     def subscribe(self, request, id):

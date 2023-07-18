@@ -55,7 +55,8 @@ class Subscribe(models.Model):
     )
     subscription = models.ForeignKey(
         'User',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="subscription"  # USERS - @action subscriptions - GET
     )
 
     class Meta:
