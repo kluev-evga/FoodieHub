@@ -36,31 +36,6 @@ class RelatedRecipesSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "image", "cooking_time")
 
 
-class SubscriptionsSerializer(serializers.ModelSerializer):
-    email = serializers.SlugRelatedField(source="subscription", slug_field="email", read_only=True)
-    id = serializers.PrimaryKeyRelatedField(source="subscription", read_only=True)
-    username = serializers.SlugRelatedField(source="subscription", slug_field="username", read_only=True)
-    first_name = serializers.SlugRelatedField(source="subscription", slug_field="first_name", read_only=True)
-    last_name = serializers.SlugRelatedField(source="subscription", slug_field="last_name", read_only=True)
-    is_subscribed = serializers.SerializerMethodField(read_only=True)
-    recipies = RelatedRecipesSerializer(source="subscription.recipes", many=True)
-    recipes_count = serializers.SerializerMethodField(source="subscription")
-
-    class Meta:
-        model = Subscribe
-        fields = ("email", "id", "username", "first_name", "last_name", "is_subscribed", "recipies", "recipes_count")
-
-    # def to_representation(self, instance):
-    #     asdf = instance
-    #     return super().to_representation(instance)
-
-    def get_is_subscribed(*args):
-        return True
-
-    def get_recipes_count(self, value):
-        return value.subscription.recipes.count()
-
-
 # ---------------------------------------------------------------CONCEPT:
 class CustomListSerializer(serializers.ListSerializer):
     def to_representation(self, data):
@@ -109,20 +84,6 @@ class SubscribeSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         serializer = TestSerializer(instance.subscription, context=self.context)
         return serializer.data
-
-        # БЫЛО:
-        # request = self.context.get("request")
-        # serializer = TestSerializer(instance.subscription, context={"request": request})
-        #
-        # recipes = instance.subscription.recipes
-        # limit = request.query_params.get("recipes_limit", None)
-        # if limit:
-        #     recipes_limit = QueryParamsSerializer(data={"recipes_limit": limit})
-        #     recipes_limit.is_valid(raise_exception=True)
-        #     recipes_limit = recipes_limit.data.get("recipes_limit")
-        #     recipes = recipes.all()[:recipes_limit]
-        # recipes = RelatedRecipesSerializer(recipes, many=True).data
-        # return {**serializer.data, "recipes": recipes}
 
     def validate(self, data):
         if self.context.get('request').user == data.get("subscription"):
