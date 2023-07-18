@@ -23,6 +23,8 @@ class UserSerializer(DjoserUserSerializer):
 
 
 class UserCreateSerializer(DjoserUserCreateSerializer):
+    """Сериализатор для создания пользователя, ограничивает длину пароля,
+       для защиты от DDOS атак)))"""
     password = serializers.CharField(max_length=150, write_only=True, required=True)
 
     class Meta:
@@ -30,14 +32,11 @@ class UserCreateSerializer(DjoserUserCreateSerializer):
         fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password')
 
 
-class RelatedRecipesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Recipe
-        fields = ("id", "name", "image", "cooking_time")
+class SubscriptionsListSerializer(serializers.ListSerializer):
+    """Ограничивает выборку отдаваемых рецептов по QUERY
+       параметру recipes_limit для endpoints:
+       users/subscribe[subscriptions]"""
 
-
-# ---------------------------------------------------------------CONCEPT:
-class CustomListSerializer(serializers.ListSerializer):
     def to_representation(self, data):
         limit = self.context.get("limit")
         limit = int(limit) if limit else None
@@ -46,15 +45,17 @@ class CustomListSerializer(serializers.ListSerializer):
         return [self.child.to_representation(item) for item in iterable]
 
 
-class RecipiesTestSerializer(serializers.ModelSerializer):
+class SubscriptionsRecipieSerializer(serializers.ModelSerializer):
     class Meta:
-        list_serializer_class = CustomListSerializer
         model = Recipe
+        list_serializer_class = SubscriptionsListSerializer
         fields = ("id", "name", "image", "cooking_time")
 
 
-class TestSerializer(UserSerializer):
-    recipies = RecipiesTestSerializer(source="recipes", many=True)
+class SubscriptionsSerializer(UserSerializer):
+    """Сериализатор для отображения всех подписок на пользователя &
+       отображения одного пользователя при подписке ан пользователя """
+    recipies = SubscriptionsRecipieSerializer(source="recipes", many=True)
     recipes_count = serializers.SerializerMethodField()
 
     def get_recipes_count(self, _):
@@ -65,12 +66,13 @@ class TestSerializer(UserSerializer):
         fields = ("email", "id", "username", "first_name", "last_name", "is_subscribed", "recipies", "recipes_count")
 
 
-# ---------------------------------------------------------------CONCEPT END
 class QueryParamsSerializer(serializers.Serializer):
     recipes_limit = serializers.IntegerField(min_value=0, required=False, default=None)
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
+    """Сериализатор для добавления подписки на пользователя"""
+
     class Meta:
         model = Subscribe
         fields = "__all__"
@@ -82,7 +84,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        serializer = TestSerializer(instance.subscription, context=self.context)
+        serializer = SubscriptionsSerializer(instance.subscription, context=self.context)
         return serializer.data
 
     def validate(self, data):

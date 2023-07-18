@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from users.models import Subscribe
-from users.serializers import SubscribeSerializer, TestSerializer, QueryParamsSerializer
+from users.serializers import SubscribeSerializer, SubscriptionsSerializer, QueryParamsSerializer
 
 User = get_user_model()
 
@@ -32,7 +32,7 @@ class UserViewSet(DjoserUserViewSet):
             serializer.is_valid(raise_exception=True)
         queryset = User.objects.filter(subscription__subscriber=request.user)
         page = self.paginate_queryset(queryset)
-        serializer = TestSerializer(page, many=True, context={"request": request, "limit": limit})
+        serializer = SubscriptionsSerializer(page, many=True, context={"request": request, "limit": limit})
         data = serializer.data
         return self.get_paginated_response(data)
 
