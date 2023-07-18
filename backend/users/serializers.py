@@ -1,3 +1,4 @@
+from api.models import Recipe
 from django.contrib.auth import get_user_model
 from djoser.serializers import UserCreateSerializer as DjoserUserCreateSerializer
 from djoser.serializers import UserSerializer as DjoserUserSerializer
@@ -5,7 +6,6 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 from users.models import Subscribe
-from api.models import Recipe
 
 User = get_user_model()
 
@@ -35,7 +35,8 @@ class UserCreateSerializer(DjoserUserCreateSerializer):
 class SubscriptionsListSerializer(serializers.ListSerializer):
     """Ограничивает выборку отдаваемых рецептов по QUERY
        параметру recipes_limit для endpoints:
-       users/subscribe[subscriptions]"""
+       users/subscribe[subscriptions].
+       Передает количество рецептов в SubscriptionsSerializer через контекст"""
 
     def to_representation(self, data):
         limit = self.context.get("limit")
@@ -64,10 +65,6 @@ class SubscriptionsSerializer(UserSerializer):
     class Meta:
         model = User
         fields = ("email", "id", "username", "first_name", "last_name", "is_subscribed", "recipies", "recipes_count")
-
-
-class QueryParamsSerializer(serializers.Serializer):
-    recipes_limit = serializers.IntegerField(min_value=0, required=False, default=None)
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
