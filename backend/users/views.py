@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from users.models import Subscribe
-from users.serializers import SubscribeSerializer, SubscriptionsSerializer, UserSerializer, TestSerializer
+from users.serializers import SubscribeSerializer, SubscriptionsSerializer, UserSerializer, TestSerializer, QueryParamsSerializer
 
 User = get_user_model()
 
@@ -41,20 +41,29 @@ class UserViewSet(DjoserUserViewSet):
 
     @action(methods=["get"], detail=False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
+        limit = request.query_params.get("recipes_limit")
+        if limit:
+            serializer = QueryParamsSerializer(data={"recipes_limit": limit})
+            serializer.is_valid(raise_exception=True)
         queryset = User.objects.filter(subscription__subscriber=request.user)
         page = self.paginate_queryset(queryset)
-        serializer = TestSerializer(page, many=True, context={"request": request, "limit": 1})
+        serializer = TestSerializer(page, many=True, context={"request": request, "limit": limit})
         data = serializer.data
         return self.get_paginated_response(data)
 
     @action(methods=["post", "delete"], detail=True, permission_classes=[IsAuthenticated])
     def subscribe(self, request, id):
         get_object_or_404(User, pk=id)
-
         data = {"subscriber": request.user.pk, "subscription": id}
-        context = {"request": request}
 
         if request.method == "POST":
+            limit = request.query_params.get("recipes_limit")
+            if limit:
+                serializer = QueryParamsSerializer(data={"recipes_limit": limit})
+                serializer.is_valid(raise_exception=True)
+
+
+            context = {"request": request,"limit": limit}
             serializer = SubscribeSerializer(data=data, context=context)
             serializer.is_valid(raise_exception=True)
             serializer.save()

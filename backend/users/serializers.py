@@ -64,8 +64,9 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
 # ---------------------------------------------------------------CONCEPT:
 class CustomListSerializer(serializers.ListSerializer):
     def to_representation(self, data):
-        self.context.get("limit")
-        iterable = data.all()[:10]
+        limit = self.context.get("limit")
+        limit = int(limit) if limit else None
+        iterable = data.all()[:limit]
         self.context["recipes_count"] = iterable.count()
         return [self.child.to_representation(item) for item in iterable]
 
@@ -91,7 +92,7 @@ class TestSerializer(UserSerializer):
 
 # ---------------------------------------------------------------CONCEPT END
 class QueryParamsSerializer(serializers.Serializer):
-    recipes_limit = serializers.IntegerField(min_value=0)
+    recipes_limit = serializers.IntegerField(min_value=0, required=False, default=None)
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
@@ -106,18 +107,22 @@ class SubscribeSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        request = self.context.get("request")
-        serializer = UserSerializer(instance.subscription, context={"request": request})
+        serializer = TestSerializer(instance.subscription, context=self.context)
+        return serializer.data
 
-        recipes = instance.subscription.recipes
-        limit = request.query_params.get("recipes_limit", None)
-        if limit:
-            recipes_limit = QueryParamsSerializer(data={"recipes_limit": limit})
-            recipes_limit.is_valid(raise_exception=True)
-            recipes_limit = recipes_limit.data.get("recipes_limit")
-            recipes = recipes.all()[:recipes_limit]
-        recipes = RelatedRecipesSerializer(recipes, many=True).data
-        return {**serializer.data, "recipes": recipes}
+        # БЫЛО:
+        # request = self.context.get("request")
+        # serializer = TestSerializer(instance.subscription, context={"request": request})
+        #
+        # recipes = instance.subscription.recipes
+        # limit = request.query_params.get("recipes_limit", None)
+        # if limit:
+        #     recipes_limit = QueryParamsSerializer(data={"recipes_limit": limit})
+        #     recipes_limit.is_valid(raise_exception=True)
+        #     recipes_limit = recipes_limit.data.get("recipes_limit")
+        #     recipes = recipes.all()[:recipes_limit]
+        # recipes = RelatedRecipesSerializer(recipes, many=True).data
+        # return {**serializer.data, "recipes": recipes}
 
     def validate(self, data):
         if self.context.get('request').user == data.get("subscription"):
