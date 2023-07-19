@@ -1,6 +1,6 @@
 from django import forms
 
-from api.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+from recipies.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 
 
 class RecipeForm(forms.ModelForm):

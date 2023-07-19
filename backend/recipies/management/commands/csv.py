@@ -1,7 +1,7 @@
 import csv
 import os
 
-from api.management.commands._abstract import AbstractCommand
+from recipies.management.commands._abstract import AbstractCommand
 
 
 class Command(AbstractCommand):

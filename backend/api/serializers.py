@@ -1,4 +1,4 @@
-from api.models import Amount, Favorite, Ingredient, Recipe, ShoppingCart, Tag
+from recipies.models import Amount, Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as translate
 from djoser.serializers import UserCreateSerializer as DjoserUserCreateSerializer

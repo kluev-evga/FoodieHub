@@ -2,12 +2,12 @@ import os
 import sys
 from glob import glob
 
-from api.management.commands._forms import (
+from recipies.management.commands._forms import (
     FavoriteForm,
     IngredientForm,
     RecipeForm,
     ShoppingCartForm,
-    TagForm,
+    TagForm
 )
 from django.core.management import BaseCommand, CommandError
 
@@ -28,7 +28,7 @@ class AbstractCommand(BaseCommand):
         "shoppingcart": ShoppingCartForm,
         "ingredient": IngredientForm,
         "favourite": FavoriteForm,
-        "tag": TagForm,
+        "tag": TagForm
     }
     FILE_EXTENSION = None
     DEFAULT_PATH = "../data/"

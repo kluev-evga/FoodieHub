@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib import admin
-from api.models import Recipe, Tag, ShoppingCart, Favorite
+from recipies.models import Recipe, Tag, ShoppingCart, Favorite
 
 User = get_user_model()
 
