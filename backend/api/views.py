@@ -85,7 +85,7 @@ class RecipeViewSet(ModelViewSet):
     filterset_class = RecipeFilter
 
     def get_permissions(self):
-        if self.action in ("partial_update", "destroy"):
+        if self.action in ("partial_update", "destroy", "download_shopping_cart"):
             return (IsOwnerOnly(),)
         return (IsAuthenticatedOrReadOnly(),)
 
