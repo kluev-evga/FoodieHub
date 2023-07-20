@@ -54,9 +54,9 @@ class UserViewSet(DjoserUserViewSet):
         return self.get_paginated_response(serializer.data)
 
     @action(methods=["post", "delete"], detail=True, permission_classes=[IsAuthenticated])
-    def subscribe(self, request, id):
-        get_object_or_404(User, pk=id)
-        data = {"subscriber": request.user.pk, "subscription": id}
+    def subscribe(self, request, **kwargs):
+        get_object_or_404(User, pk=kwargs.get("id"))
+        data = {"subscriber": request.user.pk, "subscription": kwargs.get("id")}
 
         if request.method == "POST":
             limit = request.query_params.get("recipes_limit")
