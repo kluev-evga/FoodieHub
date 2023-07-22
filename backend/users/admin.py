@@ -10,3 +10,4 @@ class UsersAdmin(UserAdmin):
     """Админ панель пользователей"""
     list_display = ("id", "username", "first_name", "last_name", "email")
     list_display_links = ("username",)
+    list_filter = ("username", "email",)

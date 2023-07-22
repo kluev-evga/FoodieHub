@@ -37,7 +37,11 @@ class Tag(models.Model):
         max_length=200,
         unique=True,
         blank=False,
-        null=False)
+        null=False,
+        validators=[validators.validate_slug])
+
+    class Meta:
+        ordering = ("name",)
 
 
 class Recipe(models.Model):
@@ -45,7 +49,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="recipes")  # для subscribe
+        related_name="recipes")
     tags = models.ManyToManyField(
         Tag)
     image = models.ImageField(
@@ -63,6 +67,13 @@ class Recipe(models.Model):
             validators.MinValueValidator(
                 1, "cooking time should be not less than one minute")])
 
+    class Meta:
+        ordering = ("author",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=("name", "author"),
+                name="unique_recipe_author")]
+
 
 class Amount(models.Model):
     """Таблица ингредиента, содержит количество и ссылку на ингредиент"""
@@ -78,12 +89,8 @@ class Amount(models.Model):
         "Ingredient",
         on_delete=models.CASCADE)
 
-    # class Meta:
-    #     constraints = [
-    #         models.UniqueConstraint(
-    #             fields=["recipe", "ingredient"],
-    #             name="recipe_ingredient_constraint"),
-    #     ]
+    class Meta:
+        ordering = ("id",)
 
 
 class Ingredient(models.Model):
@@ -103,7 +110,7 @@ class ShoppingCart(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="shopping_cart")  # -> RecipeRepresentationSerializer
+        related_name="shopping_cart")
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE)
@@ -119,7 +126,7 @@ class Favorite(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="favorite")  # -> RecipeRepresentationSerializer
+        related_name="favorite")
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE)
@@ -140,7 +147,7 @@ class Subscribe(models.Model):
     subscription = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="subscription")  # USERS - @action subscriptions - GET
+        related_name="subscription")
 
     class Meta:
         constraints = [

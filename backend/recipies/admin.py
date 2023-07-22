@@ -1,6 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from recipies.models import Favorite, Recipe, ShoppingCart, Subscribe, Tag
+from recipies.models import (
+    Favorite,
+    Recipe,
+    ShoppingCart,
+    Subscribe,
+    Tag,
+    Ingredient)
 
 User = get_user_model()
 
@@ -10,6 +16,13 @@ class RecipeAdmin(admin.ModelAdmin):
     """Админ панель рецептов"""
     list_display = ("id", "author", "name", "image", "text", "cooking_time")
     list_display_links = ("author",)
+
+
+@admin.register(Ingredient)
+class IngredientAdmin(admin.ModelAdmin):
+    list_display = ("name", "measurement_unit",)
+    list_filter = ("name",)
+    search_fields = ("name",)
 
 
 @admin.register(Tag)
@@ -37,5 +50,3 @@ class SubscribeAdmin(admin.ModelAdmin):
     """Админ панель подписок на пользователей"""
     list_display = ("id", "subscriber", "subscription")
     list_display_links = ("id",)
-    save_on_top = True
-    save_as = True
