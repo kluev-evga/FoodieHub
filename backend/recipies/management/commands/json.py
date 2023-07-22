@@ -11,7 +11,7 @@ class Command(AbstractCommand):
 
     def import_data(self, path):
         """Импортер данных из файла"""
-        self.stdout.write(f'{"_" * 35}\nИмпорт из файла {path}\n{"_" * 35}\n')
+        self.stdout.write(f'Импорт из файла {path} ...')
 
         with open(os.path.join(self.DATA_PATH, path), encoding='utf-8') as file:
             reader = json.loads(file.read())

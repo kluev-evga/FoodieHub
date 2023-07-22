@@ -3,7 +3,9 @@ from rest_framework.response import Response
 from rest_framework import serializers
 
 
-def perform_create_or_delte(pk, request, model, post_serializer, destroy_serializer):
+def perform_create_or_delte(pk, request, model,
+                            post_serializer, destroy_serializer):
+    """Используется в recipe viewSet в @action: shopping_cart & favorite"""
     arguments = {"data": {"recipe": pk}, "context": {"request": request}}
 
     if request.method == "POST":
@@ -22,10 +24,12 @@ def perform_create_or_delte(pk, request, model, post_serializer, destroy_seriali
 
 
 class QueryParamsSerializer(serializers.Serializer):
+    """Валидатор query параметра recipes_limit"""
     recipes_limit = serializers.IntegerField(min_value=0)
 
 
 def validate_limit(limit):
+    """Используется в recipe viewSet в @action: shopping_cart & favorite"""
     if limit:
         serializer = QueryParamsSerializer(data={"recipes_limit": limit})
         serializer.is_valid(raise_exception=True)

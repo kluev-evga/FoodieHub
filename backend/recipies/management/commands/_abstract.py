@@ -66,8 +66,10 @@ class AbstractCommand(BaseCommand):
         else:
             files_list = self.prompt_files_list()
 
+        self.stdout.write('Импортирование началось, дождитесь сигнала о завершении процесса ...')
         for file in files_list:
             self.import_data(file)
+        self.stdout.write('Файлы успешно импортированы !')
 
     def save_row_to_database(self, row, path):
         """Проверить валидность строки данных и записать в БД"""
