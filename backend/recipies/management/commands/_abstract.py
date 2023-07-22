@@ -31,7 +31,7 @@ class AbstractCommand(BaseCommand):
         "tag": TagForm
     }
     FILE_EXTENSION = None
-    DEFAULT_PATH = "../data/"
+    DEFAULT_PATH = "./data/"
     DATA_PATH = None
     INVALID_FILES = []
 
