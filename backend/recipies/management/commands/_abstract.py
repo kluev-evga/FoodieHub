@@ -40,11 +40,11 @@ class AbstractCommand(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--all',
-            action='store_true',
+            "--all",
+            action="store_true",
             help=f"импортировать все {self.FILE_EXTENSION} файлы")
         parser.add_argument(
-            '--path',
+            "--path",
             help=(f"путь до директории с {self.FILE_EXTENSION} "
                   "файлами относительно manage.py"))
 
@@ -66,10 +66,11 @@ class AbstractCommand(BaseCommand):
         else:
             files_list = self.prompt_files_list()
 
-        self.stdout.write('Импортирование началось, дождитесь сигнала о завершении процесса ...')
+        self.stdout.write("Импортирование началось, "
+                          "дождитесь сигнала о завершении процесса ...")
         for file in files_list:
             self.import_data(file)
-        self.stdout.write('Файлы успешно импортированы !')
+        self.stdout.write("Файлы успешно импортированы !")
 
     def save_row_to_database(self, row, path):
         """Проверить валидность строки данных и записать в БД"""
@@ -122,7 +123,8 @@ class AbstractCommand(BaseCommand):
                          "\nEnter - выбрать все"
                          "\n1,2,3 - выбрать через запятую"
                          "\nQ     - выйти\033[0m\n")
-        error_message = "\033[0;31mНекорректный ввод, попробуйте еще раз:\033[0m"
+        error_message = ("\033[0;31mНекорректный ввод, "
+                         "попробуйте еще раз:\033[0m")
 
         selection = input(input_message)
         valid_values = tuple(range(1, len(files_list) + 1))

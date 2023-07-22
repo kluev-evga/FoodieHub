@@ -13,7 +13,8 @@ class Command(AbstractCommand):
         """Импортер данных из файла"""
         self.stdout.write(f'Импорт из файла {path} ...')
 
-        with open(os.path.join(self.DATA_PATH, path), encoding='utf-8') as file:
+        with open(os.path.join(self.DATA_PATH, path),
+                  encoding='utf-8') as file:
             reader = json.loads(file.read())
             for row in reader:
                 form = self.save_row_to_database(row=row, path=path)
