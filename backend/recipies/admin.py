@@ -1,6 +1,12 @@
-from django.contrib.auth import get_user_model
 from django.contrib import admin
-from recipies.models import Recipe, Tag, ShoppingCart, Favorite
+from django.contrib.auth import get_user_model
+from recipies.models import (
+    Favorite,
+    Recipe,
+    ShoppingCart,
+    Subscribe,
+    Tag,
+    Ingredient)
 
 User = get_user_model()
 
@@ -8,25 +14,39 @@ User = get_user_model()
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     """Админ панель рецептов"""
-    list_display = ('id', "author", "name", "image", "text", "cooking_time")
+    list_display = ("id", "author", "name", "image", "text", "cooking_time")
     list_display_links = ("author",)
+
+
+@admin.register(Ingredient)
+class IngredientAdmin(admin.ModelAdmin):
+    list_display = ("name", "measurement_unit",)
+    list_filter = ("name",)
+    search_fields = ("name",)
 
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     """Админ панель тегов"""
-    list_display = ('id', "name", "color", "slug")
+    list_display = ("id", "name", "color", "slug")
     list_display_links = ("name",)
 
 
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
     """Админ панель покупок"""
-    list_display = ('user', 'recipe',)
-    empty_value_display = '-пусто-'
+    list_display = ("user", "recipe",)
+    empty_value_display = "-пусто-"
 
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     """Админ панель избранное"""
-    list_display = ('user', 'recipe',)
+    list_display = ("user", "recipe",)
+
+
+@admin.register(Subscribe)
+class SubscribeAdmin(admin.ModelAdmin):
+    """Админ панель подписок на пользователей"""
+    list_display = ("id", "subscriber", "subscription")
+    list_display_links = ("id",)

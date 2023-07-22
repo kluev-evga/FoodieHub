@@ -15,7 +15,7 @@ def validate_not_zero(value):
 
 
 def validate_hex_color(value):
-    pattern = re.compile(r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$')
+    pattern = re.compile(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
     if not pattern.match(value):
         raise ValidationError(translate("value is not valid color"))
 
@@ -26,21 +26,22 @@ class Tag(models.Model):
         max_length=200,
         unique=True,
         blank=False,
-        null=False
-    )
+        null=False)
     color = models.CharField(
         max_length=7,
         unique=True,
         blank=False,
         null=False,
-        validators=[validate_hex_color]
-    )
+        validators=[validate_hex_color])
     slug = models.SlugField(
         max_length=200,
         unique=True,
         blank=False,
-        null=False
-    )
+        null=False,
+        validators=[validators.validate_slug])
+
+    class Meta:
+        ordering = ("name",)
 
 
 class Recipe(models.Model):
@@ -48,31 +49,30 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="recipes" # для subscribe
-    )
+        related_name="recipes")
     tags = models.ManyToManyField(
-        Tag,
-    )
+        Tag)
     image = models.ImageField(
-        upload_to="recipe/"
-    )
+        upload_to="recipe/")
     name = models.CharField(
         max_length=200,
         blank=False,
-        null=False
-    )
+        null=False)
     text = models.TextField(
         max_length=5000,
         blank=False,
-        null=False
-    )
+        null=False)
     cooking_time = models.PositiveIntegerField(
         validators=[
             validators.MinValueValidator(
-                1,
-                "cooking time should be not less than one minute")
-        ]
-    )
+                1, "cooking time should be not less than one minute")])
+
+    class Meta:
+        ordering = ("author",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=("name", "author"),
+                name="unique_recipe_author")]
 
 
 class Amount(models.Model):
@@ -81,25 +81,16 @@ class Amount(models.Model):
         validators=[
             validate_not_zero,
             validators.MaxValueValidator(
-                10000,
-                translate("Not more than 10000"))
-        ]
-    )
+                10000, translate("Not more than 10000"))])
     recipe = models.ManyToManyField(
         Recipe,
-        related_name="ingredients",
-    )
+        related_name="ingredients")
     ingredient = models.ForeignKey(
         "Ingredient",
-        on_delete=models.CASCADE
-    )
+        on_delete=models.CASCADE)
 
-    # class Meta:
-    #     constraints = [
-    #         models.UniqueConstraint(
-    #             fields=['recipe', 'ingredient'],
-    #             name='recipe_ingredient_constraint'),
-    #     ]
+    class Meta:
+        ordering = ("id",)
 
 
 class Ingredient(models.Model):
@@ -108,48 +99,62 @@ class Ingredient(models.Model):
         max_length=200,
         unique=True,
         blank=False,
-        null=False
-    )
+        null=False)
     measurement_unit = models.CharField(
         max_length=200,
         blank=False,
-        null=False
-    )
+        null=False)
 
 
 class ShoppingCart(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="shopping_cart"  # -> RecipeRepresentationSerializer
-    )
+        related_name="shopping_cart")
     recipe = models.ForeignKey(
         Recipe,
-        on_delete=models.CASCADE
-    )
+        on_delete=models.CASCADE)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipe'],
-                name='shopping_cart_user_recipe_constraint'),
-        ]
+                fields=["user", "recipe"],
+                name="shopping_cart_user_recipe_constraint")]
 
 
 class Favorite(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="favorite"  # -> RecipeRepresentationSerializer
-    )
+        related_name="favorite")
     recipe = models.ForeignKey(
         Recipe,
-        on_delete=models.CASCADE
-    )
+        on_delete=models.CASCADE)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipe'],
-                name='favorite_user_recipe_constraint'),
+                fields=["user", "recipe"],
+                name="favorite_user_recipe_constraint")]
+
+
+class Subscribe(models.Model):
+    """Модель подписки пользователей на других пользователей"""
+    subscriber = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="subscriptions")
+    subscription = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="subscription")
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["subscriber", "subscription"],
+                name="unique user subscription"),
+            models.CheckConstraint(
+                check=~models.Q(subscriber=models.F("subscription")),
+                name="self subscription")
         ]

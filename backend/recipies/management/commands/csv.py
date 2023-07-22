@@ -11,7 +11,7 @@ class Command(AbstractCommand):
 
     def import_data(self, path):
         """Извлечь данные из CSV, вызвать валидацию и распечатать ошибки"""
-        self.stdout.write(f'{"_" * 35}\nИмпорт из файла {path}\n{"_" * 35}\n')
+        self.stdout.write(f'Импорт из файла {path} ...')
 
         with open(os.path.join(self.DATA_PATH, path),
                   mode='r',

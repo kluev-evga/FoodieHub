@@ -1,14 +1,39 @@
 version: '3.3'
+
+volumes:
+  database:
+  static:
+  media:
+
 services:
+  db:
+    image: postgres:13.0-alpine
+    volumes:
+      - database:/var/lib/postgresql/data
+    env_file:
+      - ../backend/.env
+
+  backend:
+    build: ../backend/
+    depends_on:
+      - db
+    env_file:
+      - ../backend/.env
+    volumes:
+      - static:/app/static/
+      - media:/app/media/
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    build: ../frontend/
+    depends_on:
+      - backend
     volumes:
       - ../frontend/:/app/result_build/
+
   nginx:
     image: nginx:1.19.3
+    depends_on:
+      - frontend
     ports:
       - "80:80"
     volumes:

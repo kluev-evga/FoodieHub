@@ -1,33 +1,42 @@
 from api.filters import IngredientFilter, RecipeFilter
-from recipies.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+from api.pagination import PageCountPagination
+from api.permissions import IsOwnerOnly
 from api.serializers import (
-    SubscribeSerializer,
-    SubscriptionsSerializer,
     FavoriteDestroySerializer,
     FavoriteSerializer,
     IngredientSerializer,
     RecipeSerializer,
     ShoppingCartDestroySerializer,
     ShoppingCartSerializer,
-    TagSerializer,
-)
-from api.permissions import IsOwnerOnly
+    SubscribeSerializer,
+    SubscriptionsSerializer,
+    TagSerializer)
 from api.utils import perform_create_or_delte, validate_limit
 from django.contrib.auth import get_user_model
 from django.db.models import F, Sum
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
+from recipies.models import (
+    Favorite,
+    Ingredient,
+    Recipe,
+    ShoppingCart,
+    Subscribe,
+    Tag)
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from users.models import Subscribe
 
 User = get_user_model()
 
 
 class UserViewSet(DjoserUserViewSet):
+    pagination_class = PageCountPagination
+
     activation = None
     resend_activation = None
     reset_password = None
@@ -36,12 +45,15 @@ class UserViewSet(DjoserUserViewSet):
     reset_username = None
     reset_username_confirm = None
 
-    @action(["get"], detail=False)
+    @action(["get"],
+            detail=False)
     def me(self, request, *args, **kwargs):
         self.get_object = self.get_instance
         return self.retrieve(request, *args, **kwargs)
 
-    @action(methods=["get"], detail=False, permission_classes=[IsAuthenticated])
+    @action(methods=["get"],
+            detail=False,
+            permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
         limit = request.query_params.get("recipes_limit")
         validate_limit(limit)
@@ -49,22 +61,23 @@ class UserViewSet(DjoserUserViewSet):
         serializer = SubscriptionsSerializer(
             context={"request": request, "limit": limit},
             instance=self.paginate_queryset(queryset),
-            many=True
-        )
+            many=True)
         return self.get_paginated_response(serializer.data)
 
-    @action(methods=["post", "delete"], detail=True, permission_classes=[IsAuthenticated])
+    @action(methods=["post", "delete"],
+            detail=True,
+            permission_classes=[IsAuthenticated])
     def subscribe(self, request, **kwargs):
         get_object_or_404(User, pk=kwargs.get("id"))
-        data = {"subscriber": request.user.pk, "subscription": kwargs.get("id")}
+        data = {"subscriber": request.user.pk,
+                "subscription": kwargs.get("id")}
 
         if request.method == "POST":
             limit = request.query_params.get("recipes_limit")
             validate_limit(limit)
             serializer = SubscribeSerializer(
                 context={"request": request, "limit": limit},
-                data=data
-            )
+                data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
@@ -78,14 +91,17 @@ class UserViewSet(DjoserUserViewSet):
 
 
 class RecipeViewSet(ModelViewSet):
-    queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    http_method_names = ('head', 'options', 'get', 'post', 'patch', 'delete')
-    filter_backends = (DjangoFilterBackend,)
+    queryset = Recipe.objects.all()
+    pagination_class = PageCountPagination
     filterset_class = RecipeFilter
+    filter_backends = (DjangoFilterBackend,)
+    http_method_names = ("head", "options", "get", "post", "patch", "delete")
 
     def get_permissions(self):
-        if self.action in ("partial_update", "destroy", "download_shopping_cart"):
+        if self.action in ("destroy",
+                           "partial_update",
+                           "download_shopping_cart"):
             return (IsOwnerOnly(),)
         return (IsAuthenticatedOrReadOnly(),)
 
@@ -94,7 +110,8 @@ class RecipeViewSet(ModelViewSet):
             ingredient.delete()
         instance.delete()
 
-    @action(methods=['get'], detail=False)
+    @action(methods=["get"],
+            detail=False)
     def download_shopping_cart(self, request):
         queryset = ShoppingCart.objects.filter(
             user=request.user
@@ -105,38 +122,36 @@ class RecipeViewSet(ModelViewSet):
         )
         return Response(queryset)
 
-    @action(methods=['post', 'delete'], detail=True)
+    @action(methods=["post", "delete"],
+            detail=True)
     def shopping_cart(self, request, pk):
         arguments = {
             "pk": pk,
             "request": request,
             "model": ShoppingCart,
             "post_serializer": ShoppingCartSerializer,
-            "destroy_serializer": ShoppingCartDestroySerializer
-        }
+            "destroy_serializer": ShoppingCartDestroySerializer}
         return perform_create_or_delte(**arguments)
 
-    @action(methods=['post', 'delete'], detail=True)
+    @action(methods=["post", "delete"],
+            detail=True)
     def favorite(self, request, pk):
         arguments = {
             "pk": pk,
             "request": request,
             "model": Favorite,
             "post_serializer": FavoriteSerializer,
-            "destroy_serializer": FavoriteDestroySerializer
-        }
+            "destroy_serializer": FavoriteDestroySerializer}
         return perform_create_or_delte(**arguments)
 
 
 class TagViewSet(ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
-    pagination_class = None
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
-    pagination_class = None
     filterset_class = IngredientFilter
     filter_backends = (DjangoFilterBackend,)
