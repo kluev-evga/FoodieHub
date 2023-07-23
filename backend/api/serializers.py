@@ -4,6 +4,11 @@ from djoser.serializers import (
     UserCreateSerializer as DjoserUserCreateSerializer)
 from djoser.serializers import UserSerializer as DjoserUserSerializer
 from drf_base64.fields import Base64ImageField
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+from rest_framework.validators import UniqueTogetherValidator
+
+from api.utils import serialize_ingredients
 from recipies.models import (
     Amount,
     Favorite,
@@ -12,9 +17,6 @@ from recipies.models import (
     ShoppingCart,
     Subscribe,
     Tag)
-from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-from rest_framework.validators import UniqueTogetherValidator
 
 User = get_user_model()
 
@@ -136,18 +138,9 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "color", "slug")
 
 
-class IngredientsInRecipeSerializer(serializers.ModelSerializer):
-    """Сериализатор для создания ингредиента в рецепте"""
-
-    class Meta:
-        model = Amount
-        fields = ("amount", "ingredient")
-
-
 class RecipeRepresentationSerializer(serializers.ModelSerializer):
     """Сериализатор рецептов для ответа на запросы
        используется в сериализаторе RecipeSerializer """
-
     tags = TagSerializer(many=True, read_only=True)
     ingredients = IngredientsSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
@@ -157,7 +150,7 @@ class RecipeRepresentationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = "__all__"
+        exclude = ("pub_date",)
 
     def get_is_favorited(self, instance):
         request = self.context.get("request")
@@ -190,6 +183,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def to_representation(self, instance):
+        """Сериализует ответ на запросы GET & GET(list) & POST & PATCH"""
         context = self.context.get("request")
         serializer = RecipeRepresentationSerializer(
             instance,
@@ -206,11 +200,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(**validated_data, author=author)
         recipe.tags.set(tags)
 
-        data = [{"ingredient": item.get("ingredient").pk, "amount": item.get(
-            "amount")} for item in ingredients]
-        serializer = IngredientsInRecipeSerializer(many=True, data=data)
-        serializer.is_valid(raise_exception=True)
-
+        serialize_ingredients(ingredients)
         ingredient_list = []
         for item in ingredients:
             amount = Amount.objects.create(**item)
@@ -222,15 +212,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         """Сериализует и валидирует ингредиенты,
            удаляет их все и сохраняет заново,
            после чего передает данные в базовый метод update"""
-        ingredients = validated_data.pop("ingredients", None)
-        data = [{"ingredient": item.get("ingredient").pk,
-                 "amount": item.get("amount")} for item in ingredients]
-        serializer = IngredientsInRecipeSerializer(data=data, many=True)
-        serializer.is_valid(raise_exception=True)
-
         for ingredient in instance.ingredients.all():
             ingredient.delete()
 
+        ingredients = validated_data.pop("ingredients")
+        serialize_ingredients(ingredients)
         ingredient_list = []
         for item in ingredients:
             amount = Amount.objects.create(**item)

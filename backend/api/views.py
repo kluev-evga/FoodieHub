@@ -1,6 +1,17 @@
+from django.contrib.auth import get_user_model
+from django.db.models import F, Sum
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import UserViewSet as DjoserUserViewSet
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+
 from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import PageCountPagination
-from api.permissions import IsOwnerOnly
+from api.permissions import IDKpermission
 from api.serializers import (
     FavoriteDestroySerializer,
     FavoriteSerializer,
@@ -11,12 +22,11 @@ from api.serializers import (
     SubscribeSerializer,
     SubscriptionsSerializer,
     TagSerializer)
-from api.utils import perform_create_or_delte, validate_limit
-from django.contrib.auth import get_user_model
-from django.db.models import F, Sum
-from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
-from djoser.views import UserViewSet as DjoserUserViewSet
+from api.utils import (
+    perform_create_or_delete,
+    validate_limit,
+    UserViewSetMixin
+)
 from recipies.models import (
     Favorite,
     Ingredient,
@@ -24,26 +34,12 @@ from recipies.models import (
     ShoppingCart,
     Subscribe,
     Tag)
-from rest_framework.decorators import action
-from rest_framework.permissions import (
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly)
-from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 User = get_user_model()
 
 
-class UserViewSet(DjoserUserViewSet):
+class UserViewSet(UserViewSetMixin, DjoserUserViewSet):
     pagination_class = PageCountPagination
-
-    activation = None
-    resend_activation = None
-    reset_password = None
-    reset_password_confirm = None
-    set_username = None
-    reset_username = None
-    reset_username_confirm = None
 
     @action(["get"],
             detail=False)
@@ -85,9 +81,10 @@ class UserViewSet(DjoserUserViewSet):
         instance = Subscribe.objects.filter(**data)
         if instance:
             instance.delete()
-            return Response(status=204)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
-        return Response({"message": "Подписки не существует"}, status=400)
+        return Response({"message": "Подписки не существует"},
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 class RecipeViewSet(ModelViewSet):
@@ -97,13 +94,7 @@ class RecipeViewSet(ModelViewSet):
     filterset_class = RecipeFilter
     filter_backends = (DjangoFilterBackend,)
     http_method_names = ("head", "options", "get", "post", "patch", "delete")
-
-    def get_permissions(self):
-        if self.action in ("destroy",
-                           "partial_update",
-                           "download_shopping_cart"):
-            return (IsOwnerOnly(),)
-        return (IsAuthenticatedOrReadOnly(),)
+    permission_classes = (IDKpermission,)
 
     def perform_destroy(self, instance):
         for ingredient in instance.ingredients.all():
@@ -131,7 +122,7 @@ class RecipeViewSet(ModelViewSet):
             "model": ShoppingCart,
             "post_serializer": ShoppingCartSerializer,
             "destroy_serializer": ShoppingCartDestroySerializer}
-        return perform_create_or_delte(**arguments)
+        return perform_create_or_delete(**arguments)
 
     @action(methods=["post", "delete"],
             detail=True)
@@ -142,7 +133,7 @@ class RecipeViewSet(ModelViewSet):
             "model": Favorite,
             "post_serializer": FavoriteSerializer,
             "destroy_serializer": FavoriteDestroySerializer}
-        return perform_create_or_delte(**arguments)
+        return perform_create_or_delete(**arguments)
 
 
 class TagViewSet(ReadOnlyModelViewSet):
