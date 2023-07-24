@@ -5,13 +5,15 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import PageCountPagination
-from api.permissions import IDKpermission
+from api.permissions import IsOwnerOnly
 from api.serializers import (
     FavoriteDestroySerializer,
     FavoriteSerializer,
@@ -93,7 +95,13 @@ class RecipeViewSet(ModelViewSet):
     filterset_class = RecipeFilter
     filter_backends = (DjangoFilterBackend,)
     http_method_names = ("head", "options", "get", "post", "patch", "delete")
-    permission_classes = (IDKpermission,)
+
+    def get_permissions(self):
+        if self.action in ("destroy",
+                           "partial_update",
+                           "download_shopping_cart"):
+            return (IsOwnerOnly(),)
+        return (IsAuthenticatedOrReadOnly(),)
 
     def perform_destroy(self, instance):
         instance.recipe_ingredients.all().delete()
