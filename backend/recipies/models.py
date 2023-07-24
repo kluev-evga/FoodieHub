@@ -55,6 +55,9 @@ class Recipe(models.Model):
     cooking_time = models.PositiveSmallIntegerField(
         "время приготовления",
         validators=validate_small_integer())
+    ingredients = models.ManyToManyField(
+        "Ingredient",
+        through="RecipeIngredient")
     pub_date = models.DateTimeField(
         "дата публикации",
         auto_now_add=True,
@@ -69,24 +72,26 @@ class Recipe(models.Model):
         return f'"{self.author}" >>> "{self.name}"'
 
 
-class Amount(models.Model):
+class RecipeIngredient(models.Model):
     """Таблица ингредиента, содержит количество и ссылку на ингредиент"""
-    amount = models.PositiveSmallIntegerField(
-        "количество ингредиента",
-        validators=validate_small_integer())
-    recipe = models.ManyToManyField(
+    recipe = models.ForeignKey(
         Recipe,
         verbose_name="рецепт",
-        related_name="ingredients")
+        on_delete=models.CASCADE,
+        related_name="recipe_ingredients")
     ingredient = models.ForeignKey(
         "Ingredient",
         verbose_name="ингредиент",
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,
+        related_name="ingredients_recipe")
+    amount = models.PositiveSmallIntegerField(
+        "количество ингредиента",
+        validators=validate_small_integer())
 
     class Meta:
-        verbose_name = "количество"
-        verbose_name_plural = "количество"
-        ordering = ("id",)
+        verbose_name = "ингредиент"
+        verbose_name_plural = "ингредиенты"
+        ordering = ("recipe",)
 
 
 class Ingredient(models.Model):
@@ -103,6 +108,9 @@ class Ingredient(models.Model):
         verbose_name = "ингредиент"
         verbose_name_plural = "ингредиенты"
         ordering = ("name",)
+
+    def __str__(self):
+        return self.name
 
 
 class ShoppingCart(models.Model):

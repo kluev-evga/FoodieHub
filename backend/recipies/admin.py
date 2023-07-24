@@ -5,11 +5,17 @@ from recipies.models import (
     Favorite,
     Ingredient,
     Recipe,
+    RecipeIngredient,
     ShoppingCart,
     Subscribe,
     Tag)
 
 User = get_user_model()
+
+
+class RecipeIngredientInline(admin.TabularInline):
+    model = RecipeIngredient
+    extra = 1
 
 
 @admin.register(Recipe)
@@ -18,6 +24,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = ("id", "author", "name", "image",
                     "text", "cooking_time", "pub_date")
     list_display_links = ("author",)
+    inlines = (RecipeIngredientInline,)
 
 
 @admin.register(Ingredient)

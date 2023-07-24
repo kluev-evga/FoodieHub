@@ -25,8 +25,7 @@ from api.serializers import (
 from api.utils import (
     perform_create_or_delete,
     validate_limit,
-    UserViewSetMixin
-)
+    UserViewSetMixin)
 from recipies.models import (
     Favorite,
     Ingredient,
@@ -97,8 +96,7 @@ class RecipeViewSet(ModelViewSet):
     permission_classes = (IDKpermission,)
 
     def perform_destroy(self, instance):
-        for ingredient in instance.ingredients.all():
-            ingredient.delete()
+        instance.recipe_ingredients.all().delete()
         instance.delete()
 
     @action(methods=["get"],
@@ -107,9 +105,9 @@ class RecipeViewSet(ModelViewSet):
         queryset = ShoppingCart.objects.filter(
             user=request.user
         ).values(
-            name=F("recipe__ingredients__ingredient__name")
+            name=F("recipe__recipe_ingredients__ingredient__name")
         ).annotate(
-            amount=Sum("recipe__ingredients__amount")
+            amount=Sum("recipe__recipe_ingredients__amount")
         )
         return Response(queryset)
 
