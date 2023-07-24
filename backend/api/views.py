@@ -1,13 +1,11 @@
 from django.contrib.auth import get_user_model
-from django.db.models import F, Sum
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import (
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly)
+    IsAuthenticated, IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
@@ -21,20 +19,15 @@ from api.serializers import (
     RecipeSerializer,
     ShoppingCartDestroySerializer,
     ShoppingCartSerializer,
-    SubscribeSerializer,
-    SubscriptionsSerializer,
     TagSerializer)
+from api.serializers_user import SubscribeSerializer, SubscriptionsSerializer
 from api.utils import (
     perform_create_or_delete,
     validate_limit,
-    UserViewSetMixin)
+    UserViewSetMixin,
+    make_ingredients_txt_response)
 from recipies.models import (
-    Favorite,
-    Ingredient,
-    Recipe,
-    ShoppingCart,
-    Subscribe,
-    Tag)
+    Favorite, Ingredient, Recipe, ShoppingCart, Subscribe, Tag)
 
 User = get_user_model()
 
@@ -110,14 +103,7 @@ class RecipeViewSet(ModelViewSet):
     @action(methods=["get"],
             detail=False)
     def download_shopping_cart(self, request):
-        queryset = ShoppingCart.objects.filter(
-            user=request.user
-        ).values(
-            name=F("recipe__recipe_ingredients__ingredient__name")
-        ).annotate(
-            amount=Sum("recipe__recipe_ingredients__amount")
-        )
-        return Response(queryset)
+        return make_ingredients_txt_response(request)
 
     @action(methods=["post", "delete"],
             detail=True)

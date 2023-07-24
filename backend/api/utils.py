@@ -1,9 +1,15 @@
+from pathlib import Path
+
+from django.db.models import F, Sum
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from django.shortcuts import HttpResponse
 from django.utils.translation import gettext_lazy as translate
+from drf_base64.fields import Base64ImageField
 from rest_framework import serializers, status
 from rest_framework.response import Response
-from drf_base64.fields import Base64ImageField
 
-from recipies.models import RecipeIngredient, Recipe
+from recipies.models import Recipe, RecipeIngredient, ShoppingCart
 
 
 def perform_create_or_delete(pk, request, model,
@@ -88,3 +94,34 @@ class AbstractSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ("id", "name", "image", "cooking_time", "user", "recipe")
+
+
+@receiver(post_delete, sender=Recipe)
+def delete_image(sender, instance, *a, **kw):
+    """Удаление картинки при удалении рецепта"""
+    image = Path(instance.image.path)
+    if image.exists():
+        image.unlink()
+
+
+def make_ingredients_txt_response(request):
+    ingredients = ShoppingCart.objects.filter(
+        user=request.user
+    ).values(
+        name=F("recipe__recipe_ingredients__ingredient__name"),
+        measurement_unit=F(
+            "recipe__recipe_ingredients__ingredient__measurement_unit")
+    ).annotate(
+        amount=Sum("recipe__recipe_ingredients__amount")
+    )
+    shopping_list = '\n'.join([
+        f'- {ingredient["name"]} '
+        f'({ingredient["measurement_unit"]})'
+        f' - {ingredient["amount"]}'
+        for ingredient in ingredients
+    ])
+    response = HttpResponse(shopping_list,
+                            content_type='text.txt; charset=utf-8')
+    filename = f'{request.user}_shopping_list.txt'
+    response['Content-Disposition'] = f'attachment; filename={filename}'
+    return response

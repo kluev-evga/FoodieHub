@@ -2,13 +2,8 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 
 from recipies.models import (
-    Favorite,
-    Ingredient,
-    Recipe,
-    RecipeIngredient,
-    ShoppingCart,
-    Subscribe,
-    Tag)
+    Favorite, Ingredient, Recipe, RecipeIngredient,
+    ShoppingCart, Subscribe, Tag)
 
 User = get_user_model()
 
@@ -23,7 +18,7 @@ class RecipeAdmin(admin.ModelAdmin):
     """Админ панель рецептов"""
     list_display = ("id", "author", "name", "image",
                     "text", "cooking_time", "pub_date")
-    list_display_links = ("author",)
+    list_display_links = ("name",)
     inlines = (RecipeIngredientInline,)
 
 
