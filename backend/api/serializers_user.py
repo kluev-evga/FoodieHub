@@ -66,9 +66,7 @@ class SubscriptionsRecipieSerializer(serializers.ModelSerializer):
 class SubscriptionsSerializer(UserSerializer):
     """Сериализатор для отображения всех подписок на пользователя &
        отображения одного пользователя при подписке ан пользователя """
-    recipies = SubscriptionsRecipieSerializer(
-        source="recipes",
-        many=True)
+    recipes = SubscriptionsRecipieSerializer(many=True)
     recipes_count = serializers.SerializerMethodField()
 
     def get_recipes_count(self, _):
@@ -76,8 +74,7 @@ class SubscriptionsSerializer(UserSerializer):
 
     class Meta:
         model = User
-        fields = ("email", "id", "username", "first_name",
-                  "last_name", "is_subscribed", "recipies", "recipes_count")
+        fields = "__all__"
 
 
 class SubscribeSerializer(serializers.ModelSerializer):

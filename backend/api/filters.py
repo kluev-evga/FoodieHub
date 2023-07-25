@@ -6,7 +6,7 @@ class IngredientFilter(filters.FilterSet):
     """Фильтр ингредиентов оп query параметру name"""
     name = filters.CharFilter(
         field_name="name",
-        lookup_expr="startswith")
+        lookup_expr="istartswith")
 
     class Meta:
         model = Ingredient

@@ -7,32 +7,6 @@ from recipies.validators import validate_hex_color, validate_small_integer
 User = get_user_model()
 
 
-class Tag(models.Model):
-    """Таблица тегов"""
-    name = models.CharField(
-        "имя тега",
-        max_length=200,
-        unique=True)
-    color = models.CharField(
-        "цветовой код",
-        max_length=7,
-        unique=True,
-        validators=[validate_hex_color])
-    slug = models.SlugField(
-        "http link",
-        max_length=200,
-        unique=True,
-        validators=[validators.validate_slug])
-
-    class Meta:
-        verbose_name = "тег"
-        verbose_name_plural = "теги"
-        ordering = ("name",)
-
-    def __str__(self):
-        return self.name
-
-
 class Recipe(models.Model):
     """Таблица рецепта"""
     author = models.ForeignKey(
@@ -41,7 +15,7 @@ class Recipe(models.Model):
         on_delete=models.CASCADE,
         related_name="recipes")
     tags = models.ManyToManyField(
-        Tag,
+        "Tag",
         "теги")
     image = models.ImageField(
         "фото рецепта",
@@ -73,7 +47,8 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    """Таблица ингредиента, содержит количество и ссылку на ингредиент"""
+    """Промежуточная таблица recipe -> ingredient
+       дополнительно содержит amount ингредиента"""
     recipe = models.ForeignKey(
         Recipe,
         verbose_name="рецепт",
@@ -95,7 +70,7 @@ class RecipeIngredient(models.Model):
 
 
 class Ingredient(models.Model):
-    """Таблица ингредиент, содержит только информацию об ингредиенте"""
+    """Таблица ингредиент ингредиентов в рецепте"""
     name = models.CharField(
         "название ингредиента",
         max_length=200,
@@ -107,6 +82,32 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = "ингредиент"
         verbose_name_plural = "ингредиенты"
+        ordering = ("name",)
+
+    def __str__(self):
+        return self.name
+
+
+class Tag(models.Model):
+    """Таблица тегов"""
+    name = models.CharField(
+        "имя тега",
+        max_length=200,
+        unique=True)
+    color = models.CharField(
+        "цветовой код",
+        max_length=7,
+        unique=True,
+        validators=[validate_hex_color])
+    slug = models.SlugField(
+        "http link",
+        max_length=200,
+        unique=True,
+        validators=[validators.validate_slug])
+
+    class Meta:
+        verbose_name = "тег"
+        verbose_name_plural = "теги"
         ordering = ("name",)
 
     def __str__(self):
@@ -138,12 +139,12 @@ class Favorite(models.Model):
     """Модель избранных рецептов"""
     user = models.ForeignKey(
         User,
-        verbose_name='пользователь',
+        verbose_name="пользователь",
         on_delete=models.CASCADE,
         related_name="favorite")
     recipe = models.ForeignKey(
         Recipe,
-        verbose_name='избранный рецепт',
+        verbose_name="избранный рецепт",
         on_delete=models.CASCADE)
 
     class Meta:
@@ -156,19 +157,19 @@ class Favorite(models.Model):
                 name="favorite_user_recipe_constraint")]
 
     def __str__(self):
-        return f'{self.user} - {self.recipe}'
+        return f"{self.user} - {self.recipe}"
 
 
 class Subscribe(models.Model):
     """Модель подписки пользователей на других пользователей"""
     subscriber = models.ForeignKey(
         User,
-        verbose_name='подписчик',
+        verbose_name="подписчик",
         on_delete=models.CASCADE,
         related_name="subscriptions")
     subscription = models.ForeignKey(
         User,
-        verbose_name='подписан на',
+        verbose_name="подписан на",
         on_delete=models.CASCADE,
         related_name="subscription")
 
