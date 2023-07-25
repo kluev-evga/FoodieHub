@@ -1,7 +1,7 @@
 import json
 import os
 
-from recipies.management.commands._abstract import AbstractCommand
+from recipes.management.commands._abstract import AbstractCommand
 
 
 class Command(AbstractCommand):

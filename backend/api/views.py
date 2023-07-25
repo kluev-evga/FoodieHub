@@ -26,7 +26,7 @@ from api.utils import (
     validate_limit,
     UserViewSetMixin,
     make_ingredients_txt_response)
-from recipies.models import (
+from recipes.models import (
     Favorite, Ingredient, Recipe, ShoppingCart, Subscribe, Tag)
 
 User = get_user_model()

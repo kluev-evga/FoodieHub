@@ -9,7 +9,7 @@ from drf_base64.fields import Base64ImageField
 from rest_framework import serializers, status
 from rest_framework.response import Response
 
-from recipies.models import Recipe, RecipeIngredient, ShoppingCart
+from recipes.models import Recipe, RecipeIngredient, ShoppingCart
 
 
 def perform_create_or_delete(pk, request, model,

@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
 
-from recipies.validators import validate_hex_color, validate_small_integer
+from recipes.validators import validate_hex_color, validate_small_integer
 
 User = get_user_model()
 

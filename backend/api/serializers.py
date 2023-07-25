@@ -5,7 +5,7 @@ from rest_framework.validators import UniqueTogetherValidator
 
 from api.serializers_user import UserSerializer
 from api.utils import AbstractSerializer, create_ingredients
-from recipies.models import (
+from recipes.models import (
     Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tag)
 
 

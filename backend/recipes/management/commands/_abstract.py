@@ -4,7 +4,7 @@ from glob import glob
 
 from django.core.management import BaseCommand, CommandError
 
-from recipies.management.commands._forms import (
+from recipes.management.commands._forms import (
     FavoriteForm,
     IngredientForm,
     RecipeForm,

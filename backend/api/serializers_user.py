@@ -6,7 +6,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
-from recipies.models import Recipe, Subscribe
+from recipes.models import Recipe, Subscribe
 
 User = get_user_model()
 
@@ -54,7 +54,7 @@ class SubscriptionsListSerializer(serializers.ListSerializer):
         return [self.child.to_representation(item) for item in iterable]
 
 
-class SubscriptionsRecipieSerializer(serializers.ModelSerializer):
+class SubscriptionsRecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для отображения рецептов в подписках"""
 
     class Meta:
@@ -66,7 +66,7 @@ class SubscriptionsRecipieSerializer(serializers.ModelSerializer):
 class SubscriptionsSerializer(UserSerializer):
     """Сериализатор для отображения всех подписок на пользователя &
        отображения одного пользователя при подписке ан пользователя """
-    recipes = SubscriptionsRecipieSerializer(many=True)
+    recipes = SubscriptionsRecipeSerializer(many=True)
     recipes_count = serializers.SerializerMethodField()
 
     def get_recipes_count(self, _):
