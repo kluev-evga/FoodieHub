@@ -17,7 +17,7 @@ class RecipeFilter(filters.FilterSet):
     """Фильтр рецептов оп query параметрам"""
     author = filters.NumberFilter(
         field_name="author")
-    tags = filters.CharFilter(
+    tags = filters.AllValuesMultipleFilter(
         field_name="tags__slug")
     is_favorited = filters.BooleanFilter(
         field_name="is_favorited",
