@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 pep8-naming flake8-broken-line flake8-return flake8-isort
+          pip install flake8 pep8-naming flake8-broken-line flake8-return
           pip install -r backend/requirements.txt
 
       - name: Test with flake8
@@ -73,6 +73,7 @@ jobs:
           script: |
             sudo rm .env
             sudo touch .env
+            sudo chmod 666 .env
             sudo echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env
             sudo echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
             sudo echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
@@ -80,13 +81,12 @@ jobs:
             sudo echo DB_PORT=${{ secrets.DB_PORT }} >> .env
             sudo echo DEBUG=${{ secrets.DEBUG }} >> .env
             sudo echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
-            sudo echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
-            cd infra/
+            cd ./infra
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-backend:latest
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-frontend:latest
-            sudo docker-compose stop
-            sudo docker-compose rm backend
-            sudo docker-compose up -d --build
+            sudo docker compose down
+            sudo docker compose rm backend
+            sudo docker compose up -d --build
 
   send_message:
     runs-on: ubuntu-latest

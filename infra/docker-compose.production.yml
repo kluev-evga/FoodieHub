@@ -14,7 +14,7 @@ services:
       - ../.env
 
   backend:
-    build: ../backend/
+    image: kluevevga/foodgram-backend
     depends_on:
       - db
     env_file:
@@ -24,7 +24,7 @@ services:
       - media:/app/media/
 
   frontend:
-    build: ../frontend/
+    image: kluevevga/foodgram-frontend
     depends_on:
       - backend
     volumes:
