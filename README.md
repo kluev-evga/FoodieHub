@@ -1,5 +1,22 @@
 # Продуктовый помошник
 
+login: yc-user
+passphrase: NRjeSf
+ip: 158.160.31.17
+
+superuser: admin:admin
+
+|username  |email              |first_name|last_name   |password |
+|----------|-------------------|----------|------------|---------|
+|Ivan      |ivanov@mail.ru     |Иван      |Иванов      |asdf1asdf|
+|nikolay   |petrov@mail.ru     |Николай   |Петров      |asdf1asdf|
+|konstantin|konstantion@mail.ru|Константин|Жуковский   |asdf1asdf|
+|alla      |shpilkina@mail.ru  |Алла      |Шпилькина   |asdf1asdf|
+|masha     |luneva@mail.ru     |Маша      |Лунева      |asdf1asdf|
+|katia     |katia@mail.ru      |Екатерина |Быстроходова|asdf1asdf|
+|polina    |polina@mail.ru     |Полина    |Чиполинова  |asdf1asdf|
+
+
 [![python version](https://img.shields.io/static/v1?label=Python&message=3.10.6&color=97ca00&style=for-the-badge)](https://python.org)
 [![django version](https://img.shields.io/static/v1?label=DJANGO&message=4.2.2&color=77ca00&style=for-the-badge)](https://www.djangoproject.com/)
 [![drf version](https://img.shields.io/static/v1?label=DRF&message=3.14.0&color=97ca00&style=for-the-badge)](https://www.django-rest-framework.org/)
