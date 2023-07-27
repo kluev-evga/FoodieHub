@@ -4,11 +4,11 @@ from django.db.models import F, Sum
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.shortcuts import HttpResponse
-from django.utils.translation import gettext_lazy as translate
 from drf_base64.fields import Base64ImageField
 from rest_framework import serializers, status
 from rest_framework.response import Response
 
+from backend import const
 from recipes.models import Recipe, RecipeIngredient, ShoppingCart
 
 
@@ -27,7 +27,7 @@ def perform_create_or_delete(pk, request, model,
     serializer.is_valid(raise_exception=True)
     instance = model.objects.filter(user=request.user, recipe_id=pk)
     if not instance:
-        return Response({"message": translate("not exist")},
+        return Response({"message": const.ERR_NOT_EXIST},
                         status=status.HTTP_400_BAD_REQUEST)
     instance.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
@@ -35,7 +35,7 @@ def perform_create_or_delete(pk, request, model,
 
 class QueryParamsSerializer(serializers.Serializer):
     """Валидатор query параметра recipes_limit"""
-    recipes_limit = serializers.IntegerField(min_value=0)
+    recipes_limit = serializers.IntegerField(min_value=const.MIN_INT_QUERY)
 
 
 def validate_limit(limit):

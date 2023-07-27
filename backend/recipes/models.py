@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
 
+from backend import const
 from recipes.validators import validate_hex_color, validate_small_integer
 
 User = get_user_model()
@@ -22,10 +23,10 @@ class Recipe(models.Model):
         upload_to="recipe/")
     name = models.CharField(
         "название рецепта",
-        max_length=200)
+        max_length=const.MAX_CHAR)
     text = models.TextField(
         "описание рецепта",
-        max_length=5000)
+        max_length=const.MAX_TEXT)
     cooking_time = models.PositiveSmallIntegerField(
         "время приготовления",
         validators=validate_small_integer())
@@ -73,11 +74,11 @@ class Ingredient(models.Model):
     """Таблица ингредиент ингредиентов в рецепте"""
     name = models.CharField(
         "название ингредиента",
-        max_length=200,
+        max_length=const.MAX_CHAR,
         unique=True)
     measurement_unit = models.CharField(
         "единица измерения",
-        max_length=200)
+        max_length=const.MAX_CHAR)
 
     class Meta:
         verbose_name = "ингредиент"
@@ -92,16 +93,16 @@ class Tag(models.Model):
     """Таблица тегов"""
     name = models.CharField(
         "имя тега",
-        max_length=200,
+        max_length=const.MAX_CHAR,
         unique=True)
     color = models.CharField(
         "цветовой код",
-        max_length=7,
+        max_length=const.HEX_LENGTH,
         unique=True,
         validators=[validate_hex_color])
     slug = models.SlugField(
         "http link",
-        max_length=200,
+        max_length=const.MAX_CHAR,
         unique=True,
         validators=[validators.validate_slug])
 

@@ -6,6 +6,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
+from backend import const
 from recipes.models import Recipe, Subscribe
 
 User = get_user_model()
@@ -32,7 +33,7 @@ class UserCreateSerializer(DjoserUserCreateSerializer):
         ограничивает длину пароля, для защиты от DDOS атак"""
     password = serializers.CharField(
         write_only=True,
-        max_length=150,
+        max_length=const.MAX_PASSWORD_LENGTH,
         required=True)
 
     class Meta:
@@ -87,7 +88,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
             UniqueTogetherValidator(
                 queryset=Subscribe.objects.all(),
                 fields=["subscriber", "subscription"],
-                message="Вы уже подписаны на данного пользователя")]
+                message=const.ERR_SELF_SUBSCRIBE)]
 
     def to_representation(self, instance):
         serializer = SubscriptionsSerializer(

@@ -1,10 +1,10 @@
-from django.utils.translation import gettext_lazy as translate
 from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from api.serializers_user import UserSerializer
 from api.utils import AbstractSerializer, create_ingredients
+from backend import const
 from recipes.models import (
     Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tag)
 
@@ -24,7 +24,9 @@ class IngredientsSerializer(serializers.ModelSerializer):
         queryset=Ingredient.objects.all())
     amount = serializers.IntegerField(
         required=True,
-        write_only=True)
+        write_only=True,
+        min_value=const.MIN_INT,
+        max_value=const.MAX_INT)
 
     class Meta:
         model = RecipeIngredient
@@ -63,6 +65,9 @@ class RecipeReadSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=False)
     is_favorited = serializers.SerializerMethodField(read_only=True)
     is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
+    cooking_time = serializers.IntegerField(
+        min_value=const.MIN_INT,
+        max_value=const.MAX_INT)
 
     class Meta:
         model = Recipe
@@ -133,7 +138,7 @@ class ShoppingCartSerializer(AbstractSerializer):
             UniqueTogetherValidator(
                 queryset=ShoppingCart.objects.all(),
                 fields=["user", "recipe"],
-                message=translate("already subscribed on that user"))]
+                message=const.ERR_SELF_SUBSCRIBE)]
 
 
 class ShoppingCartDestroySerializer(AbstractSerializer):
@@ -152,7 +157,7 @@ class FavoriteSerializer(AbstractSerializer):
             UniqueTogetherValidator(
                 queryset=Favorite.objects.all(),
                 fields=["user", "recipe"],
-                message=translate("already favorited"))]
+                message=const.ERR_FAVOURITE)]
 
 
 class FavoriteDestroySerializer(AbstractSerializer):

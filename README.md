@@ -4,18 +4,19 @@ login: yc-user
 passphrase: NRjeSf
 ip: 158.160.31.17
 
+https://foodgram-project.dynnamn.ru/
+
 superuser: admin:admin
 
-|username  |email              |first_name|last_name   |password |
-|----------|-------------------|----------|------------|---------|
-|Ivan      |ivanov@mail.ru     |Иван      |Иванов      |asdf1asdf|
-|nikolay   |petrov@mail.ru     |Николай   |Петров      |asdf1asdf|
-|konstantin|konstantion@mail.ru|Константин|Жуковский   |asdf1asdf|
-|alla      |shpilkina@mail.ru  |Алла      |Шпилькина   |asdf1asdf|
-|masha     |luneva@mail.ru     |Маша      |Лунева      |asdf1asdf|
-|katia     |katia@mail.ru      |Екатерина |Быстроходова|asdf1asdf|
-|polina    |polina@mail.ru     |Полина    |Чиполинова  |asdf1asdf|
-
+| username   | email               | first_name | last_name    | password  |
+|------------|---------------------|------------|--------------|-----------|
+| Ivan       | ivanov@mail.ru      | Иван       | Иванов       | asdf1asdf |
+| nikolay    | petrov@mail.ru      | Николай    | Петров       | asdf1asdf |
+| konstantin | konstantion@mail.ru | Константин | Жуковский    | asdf1asdf |
+| alla       | shpilkina@mail.ru   | Алла       | Шпилькина    | asdf1asdf |
+| masha      | luneva@mail.ru      | Маша       | Лунева       | asdf1asdf |
+| katia      | katia@mail.ru       | Екатерина  | Быстроходова | asdf1asdf |
+| polina     | polina@mail.ru      | Полина     | Чиполинова   | asdf1asdf |
 
 [![python version](https://img.shields.io/static/v1?label=Python&message=3.10.6&color=97ca00&style=for-the-badge)](https://python.org)
 [![django version](https://img.shields.io/static/v1?label=DJANGO&message=4.2.2&color=77ca00&style=for-the-badge)](https://www.djangoproject.com/)
@@ -33,7 +34,7 @@ Cайт Foodgram, «Продуктовый помощник».
 ## ЗАПУСК ПРОЕКТА
 
 <hr/>
-<details close>
+<details>
 <summary><h4 style="display: inline">WINDOWS <h3 style="display: inline">▶️</h3></h4></summary>
 
 _Клонировать проект_
@@ -85,7 +86,7 @@ python3 manage.py runserver
 </details>
 <hr/>
 
-<details close>
+<details>
 <summary><h4 style="display: inline">LINUX & MacOS<h3 style="display: inline">▶️</h3></h4></summary>
 
 _Клонировать проект_
@@ -140,7 +141,7 @@ python3 manage.py csv
 python3 manage.py json
 ```
 
-<details close>
+<details>
 <summary><h3 style="display: inline">Настройка SSL сертификата <h2 style="display: inline"> 🚧</h2></h3></summary>
 
 
@@ -150,12 +151,10 @@ python3 manage.py json
 
 ```yaml
 nginx:
-  ...
   ports:
     - "80:80"
     - "443:443"
   volumes:
-    ...
     - ./certbot/www:/var/www/certbot/
     - ./certbot/conf/:/etc/nginx/ssl/
 
@@ -172,7 +171,7 @@ certbot:
 
 `не забываем указать свои dns`
 
-```cfgrlanguage
+```nginx configuration
 server {
 
     listen 80;
@@ -207,7 +206,7 @@ sudo docker compose run --rm  certbot certonly --webroot --webroot-path /var/www
 `не забываем указать свои dns`  
 После обновления nginx.conf необходимо перезапустить контейнер nginx
 
-```cfgrlanguage
+```nginx configuration
 server {
     listen 80;
     listen [::]:80;

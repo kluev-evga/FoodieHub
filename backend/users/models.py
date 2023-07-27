@@ -1,38 +1,36 @@
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
-from django.utils.translation import gettext_lazy as translate
+
+from backend import const
 
 
 class User(AbstractUser):
     """Модель пользователя"""
     email = models.EmailField(
-        translate("email address"),
-        max_length=254,
+        "адрес электронной почты",
+        max_length=const.MAX_CHAR_EMAIL,
         unique=True,
         blank=False,
         null=False,
-        error_messages={
-            "unique": translate("A user with that email already exists.")})
+        error_messages={"unique": const.ERR_MSG_EMAIL})
     username = models.CharField(
-        translate("username"),
-        max_length=150,
+        "имя пользователя",
+        max_length=const.MAX_CHAR_USER,
         unique=True,
         blank=False,
         null=False,
         validators=[UnicodeUsernameValidator()],
-        error_messages={
-            "unique": translate("A user with that username already exists.")},
-        help_text=translate("Username should have 254 symbols at the most."
-                            "Allowed: letters, numbers, @/./+/-/_ only"))
+        error_messages={"unique": const.ERR_MSG_USERNAME},
+        help_text=const.HELP_USERNAME)
     first_name = models.CharField(
-        translate("first name"),
-        max_length=150,
+        "имя",
+        max_length=const.MAX_CHAR_USER,
         blank=False,
         null=False)
     last_name = models.CharField(
-        translate("last name"),
-        max_length=150,
+        "фамилия",
+        max_length=const.MAX_CHAR_USER,
         blank=False,
         null=False)
 
