@@ -1,0 +1,800 @@
+{
+	"info": {
+		"_postman_id": "8e98d86c-4333-402f-8417-d843f98e9cf3",
+		"name": "foodgram",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28577886"
+	},
+	"item": [
+		{
+			"name": "Ingredient",
+			"item": [
+				{
+					"name": "api/ingredients/",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8000/api/ingredients/?name=кар",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"ingredients",
+								""
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "кар"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/ingredients/{id}/",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8000/api/ingredients/1/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"ingredients",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Recipe",
+			"item": [
+				{
+					"name": "api/recipes/",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token e7593360b4de3359fb1b5b49a930cc5b8457d319",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/recipes/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"recipes",
+								""
+							],
+							"query": [
+								{
+									"key": "is_favorited",
+									"value": "0",
+									"disabled": true
+								},
+								{
+									"key": "author",
+									"value": "5",
+									"disabled": true
+								},
+								{
+									"key": "tags",
+									"value": "zavtrak",
+									"disabled": true
+								},
+								{
+									"key": "tags",
+									"value": "obed",
+									"disabled": true
+								},
+								{
+									"key": "tags",
+									"value": "uzhin",
+									"disabled": true
+								},
+								{
+									"key": "is_in_shopping_cart",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/recipes/",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token 8a5d9468e9f422274a9767c0907f1327c0ddee24",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ingredients\": [\n    {\n      \"id\": 1,\n      \"amount\": 100\n    },\n    {\n      \"id\": 2,\n      \"amount\": 200\n    }\n  ],\n  \"tags\": [1,3],\n  \"name\": \"чизбургер 3\",\n  \"text\": \"чизбургер с сыром 1\",\n  \"cooking_time\": 12,\n  \"image\":\"data:image/jpg;base64,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\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8000/api/recipes/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"recipes",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/recipes/{id}/",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8000/api/recipes/1/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"recipes",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/recipes/{id}/",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token 8a5d9468e9f422274a9767c0907f1327c0ddee24",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ingredients\": [\n    {\n      \"id\": 9,\n      \"amount\": 123\n    },\n    {\n      \"id\": 10,\n      \"amount\": 456\n    }\n  ],\n  \"tags\": [1],\n  \"name\": \"чизбургер\",\n  \"text\": \"чизбургер с сыром\",\n  \"cooking_time\": 120,\n  \"image\":\"data:image/jpg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAARAB4DASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAABgcA/8QALhAAAgECAwMLBQAAAAAAAAAAAgMBAAQFESESMWEGExQiMjVBUXFzsSM0crLB/8QAGAEAAgMAAAAAAAAAAAAAAAAAAgMAAQT/xAAbEQACAgMBAAAAAAAAAAAAAAAAARExAgMhMv/aAAwDAQACEQMRAD8AHqs0CsTzgikdQkezrVB5LWS7nCug3Vqvo4TEsNg55FrO+fWJoDhdwT71a2FtlcHlE5+Eb4plg4XC1PBhc8EunaUzUTHPPOOPGs8xY+OcElhg+H2bSfYrWxiVkQK4z5eGecVPLZNwattwc4c7yAerM67qoeAJCTJK4+mkRYJyoo60F2dudJy3xQTE4cu6cEr5xktKdgJzjLanXh5VJBQYwLv2x93+VV8H7I+s/M1q1DssPGmJh+wZ+QfMVKb/AL3ufcL9prVqteRSs//Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8000/api/recipes/11/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"recipes",
+								"11",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/recipes/{id}/",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token 8a5d9468e9f422274a9767c0907f1327c0ddee24",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/recipes/10/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"recipes",
+								"10",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/recipes/download_shopping_cart/",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token e7593360b4de3359fb1b5b49a930cc5b8457d319",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/recipes/download_shopping_cart/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"recipes",
+								"download_shopping_cart",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/recipes/{id}/shopping_cart/",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token e7593360b4de3359fb1b5b49a930cc5b8457d319",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/recipes/12/shopping_cart/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"recipes",
+								"12",
+								"shopping_cart",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/recipes/{id}/shopping_cart/",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token e7593360b4de3359fb1b5b49a930cc5b8457d319",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/recipes/3/shopping_cart/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"recipes",
+								"3",
+								"shopping_cart",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/recipes/{id}/favorite/",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token e7593360b4de3359fb1b5b49a930cc5b8457d319",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/recipes/5/favorite/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"recipes",
+								"5",
+								"favorite",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/recipes/{id}/favorite/",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token e7593360b4de3359fb1b5b49a930cc5b8457d319",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/recipes/1/favorite/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"recipes",
+								"1",
+								"favorite",
+								""
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "tag",
+			"item": [
+				{
+					"name": "api/tags/",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8000/api/tags/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"tags",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/tags/{id}/",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8000/api/tags/1/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"tags",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "api/users/",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token 2980085e3ce66846ee7e0de51e01679abf33ddf1",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/users/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/users/",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"vasia4@mail.ru\",\n  \"username\": \"vasya4\",\n  \"first_name\": \"Вася\",\n  \"last_name\": \"Пупкин\",\n  \"password\": \"asdf1asdf\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8000/api/users/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/users/{id}/",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token e7593360b4de3359fb1b5b49a930cc5b8457d319",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/users/5/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								"5",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/users/me/",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token e7593360b4de3359fb1b5b49a930cc5b8457d319",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/users/me/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								"me",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/users/set_password/",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token 2980085e3ce66846ee7e0de51e01679abf33ddf1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"new_password\": \"asdf1asdf\",\n  \"current_password\": \"qwerty567\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8000/api/users/set_password/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								"set_password",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/auth/token/login/",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"vasia3@mail.ru\",\n  \"password\": \"asdf1asdf\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8000/api/auth/token/login/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"auth",
+								"token",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/auth/token/logout/",
+					"request": {
+						"auth": {
+							"type": "bearer"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token 62dfcd4bf9f55a8697969aadb8a67243e5631553",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"password\": \"qwer123q\",\n  \"email\": \"vasia@mail.ru\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8000/api/auth/token/logout/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"auth",
+								"token",
+								"logout",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/users/subscriptions/",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token e7593360b4de3359fb1b5b49a930cc5b8457d319",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"password\": \"qwer123q\",\n  \"email\": \"vasia@mail.ru\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8000/api/users/subscriptions/?recipes_limit=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								"subscriptions",
+								""
+							],
+							"query": [
+								{
+									"key": "recipes_limit",
+									"value": "1"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/users/{id}/subscribe/",
+					"request": {
+						"auth": {
+							"type": "bearer"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token e7593360b4de3359fb1b5b49a930cc5b8457d319",
+								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/users/5/subscribe/?recipes_limit=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								"5",
+								"subscribe",
+								""
+							],
+							"query": [
+								{
+									"key": "recipes_limit",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/users/{id}/subscribe/",
+					"request": {
+						"auth": {
+							"type": "bearer"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token e7593360b4de3359fb1b5b49a930cc5b8457d319",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/users/5/subscribe/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								"5",
+								"subscribe",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
