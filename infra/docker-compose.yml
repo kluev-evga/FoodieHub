@@ -7,8 +7,6 @@ volumes:
 services:
   backend:
     build: ../backend/
-    depends_on:
-      - db
     env_file:
       - ../.env
     volumes:

@@ -8,14 +8,13 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = False
-ALLOWED_HOSTS = ('foodgram-project.dynnamn.ru',)
-
+DEBUG = True if os.getenv('DEBUG') == 'True' else False
 ROOT_URLCONF = 'backend.urls'
 AUTH_USER_MODEL = 'users.User'
 WSGI_APPLICATION = 'backend.wsgi.application'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-CSRF_TRUSTED_ORIGINS = ['https://foodgram-project.dynnamn.ru']
+ALLOWED_HOSTS = [string for string in os.getenv('ALLOWED_HOSTS').split(',') if string != '']
+CSRF_TRUSTED_ORIGINS = [string for string in os.getenv('CSRF_TRUSTED_ORIGINS').split(',') if string != '']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -60,6 +59,11 @@ TEMPLATES = [
 ]
 
 DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+} if os.getenv('DEBUG') == 'True' else {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('POSTGRES_DB'),
